@@ -20,10 +20,16 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^4.0.82",
     "@ai-sdk/anthropic": "^3.0.58",
+    "@ai-sdk/azure": "^3.0.48",
+    "@ai-sdk/deepseek": "^2.0.26",
     "@ai-sdk/google": "^3.0.43",
+    "@ai-sdk/groq": "^3.0.31",
     "@ai-sdk/mistral": "^3.0.24",
     "@ai-sdk/openai": "^3.0.41",
+    "@ai-sdk/perplexity": "^3.0.26",
+    "@ai-sdk/xai": "^3.0.73",
     "@eva-llm/eva-judge": "^0.1.1",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",

@@ -8,18 +8,36 @@ importers:
 
   .:
     dependencies:
+      '@ai-sdk/amazon-bedrock':
+        specifier: ^4.0.82
+        version: 4.0.82(zod@4.3.6)
       '@ai-sdk/anthropic':
         specifier: ^3.0.58
         version: 3.0.63(zod@4.3.6)
+      '@ai-sdk/azure':
+        specifier: ^3.0.48
+        version: 3.0.48(zod@4.3.6)
+      '@ai-sdk/deepseek':
+        specifier: ^2.0.26
+        version: 2.0.26(zod@4.3.6)
       '@ai-sdk/google':
         specifier: ^3.0.43
         version: 3.0.52(zod@4.3.6)
+      '@ai-sdk/groq':
+        specifier: ^3.0.31
+        version: 3.0.31(zod@4.3.6)
       '@ai-sdk/mistral':
         specifier: ^3.0.24
         version: 3.0.26(zod@4.3.6)
       '@ai-sdk/openai':
         specifier: ^3.0.41
         version: 3.0.47(zod@4.3.6)
+      '@ai-sdk/perplexity':
+        specifier: ^3.0.26
+        version: 3.0.26(zod@4.3.6)
+      '@ai-sdk/xai':
+        specifier: ^3.0.73
+        version: 3.0.73(zod@4.3.6)
       '@eva-llm/eva-judge':
         specifier: ^0.1.1
         version: 0.1.1

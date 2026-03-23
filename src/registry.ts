@@ -3,6 +3,12 @@ import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { google } from '@ai-sdk/google';
 import { mistral } from '@ai-sdk/mistral';
+import { bedrock } from '@ai-sdk/amazon-bedrock';
+import { azure } from '@ai-sdk/azure';
+import { deepseek } from '@ai-sdk/deepseek';
+import { groq } from '@ai-sdk/groq';
+import { perplexity } from '@ai-sdk/perplexity';
+import { xai } from '@ai-sdk/xai';
 
 import CONF from './config';
 
@@ -12,6 +18,12 @@ const PROVIDERS: Record<string, Function> = {
   anthropic,
   google,
   mistral,
+  bedrock,
+  azure,
+  deepseek,
+  groq,
+  perplexity,
+  xai,
 };
 
 export const getModel = (providerName: string, modelName: string): LanguageModel => {
