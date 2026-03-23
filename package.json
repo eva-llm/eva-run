@@ -1,7 +1,7 @@
 {
-  "name": "eva-run",
+  "name": "@eva-llm/eva-run",
   "version": "0.1.0",
-  "description": "Evaluations runner",
+  "description": "LLM test evaluations runner",
   "main": "dst/index.js",
   "types": "dst/index.d.ts",
   "engines": {
@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "prepare": "pnpm run build",
     "test": "echo 'No tests yet'"
   },
   "devDependencies": {
