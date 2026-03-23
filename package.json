@@ -29,7 +29,9 @@
     "@sinclair/typebox": "^0.34.48",
     "ai": "^6.0.116",
     "dotenv": "^17.3.1",
+    "@eva-llm/eva-judge": "^0.1.1",
     "fastify": "^5.8.2",
+    "lru-cache": "^11.2.7",
     "zod": "^4.3.6"
   }
 }

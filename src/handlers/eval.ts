@@ -3,9 +3,27 @@ import { Type, Static } from '@sinclair/typebox';
 
 import { run } from '../test';
 
+export const MatcherNameEnum = Type.Union([
+  Type.Literal('g-eval'),
+  Type.Literal('llm-rubric'),
+]);
+
+export const MatcherSchema = Type.Object({
+  name: MatcherNameEnum,
+  provider: Type.String(),
+  model: Type.String(),
+  criteria: Type.String(),
+  threshold: Type.Optional(Type.Number({ default: 0.5 })),
+});
+export type MatcherSchemaType = Static<typeof MatcherSchema>;
 
 export const EvalRequest = Type.Object({
-  input: Type.String(),
+  run_id: Type.String({ format: 'uuid' }),
+  test_id: Type.Optional(Type.String({ format: 'uuid' })),
+  provider: Type.String(),
+  model: Type.String(),
+  prompt: Type.String(),
+  asserts: Type.Array(MatcherSchema),
 });
 export type EvalRequestType = Static<typeof EvalRequest>;
 
@@ -19,9 +37,10 @@ export async function evalHandler(
   request: FastifyRequest<{ Body: EvalRequestType }>,
   reply: FastifyReply
 ): Promise<EvalResponseType> {
-  const { input } = request.body;
-  run();
-  return { result: `Received: ${input}` };
+  const testConfig = request.body;
+  testConfig.test_id = await getTestId();
+  run(testConfig);
+  return { test_id: testConfig.test_id };
 }
 
 export function registerEvalRoute(fastify: FastifyInstance) {
