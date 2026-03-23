@@ -13,6 +13,11 @@ import {
 import runTest from '../test';
 
 
+/**
+ * Handles evaluation requests by running a test and returning the test ID.
+ * @param {FastifyRequest<{ Body: TestSchemaT }>} request - The Fastify request object.
+ * @returns {Promise<EvalResponseT>} The response containing the test ID.
+ */
 async function evalHandler(
   request: FastifyRequest<{ Body: TestSchemaT }>,
 ): Promise<EvalResponseT> {
@@ -24,6 +29,10 @@ async function evalHandler(
   return { test_id: testConfig.test_id };
 }
 
+/**
+ * Registers the /eval route on the Fastify instance.
+ * @param {FastifyInstance} fastify - The Fastify server instance.
+ */
 export function registerEvalRoute(fastify: FastifyInstance) {
   fastify.post('/eval', {
     schema: {

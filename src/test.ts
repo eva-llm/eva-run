@@ -14,6 +14,13 @@ import {
 import { saveTestResult } from './db';
 
 
+/**
+ * Runs the matcher for a given assert and returns the result.
+ * @param {string} prompt - The prompt string.
+ * @param {string} output - The output string.
+ * @param {AssertSchemaT} assert - The assert configuration.
+ * @returns {Promise<IAssertResult>} The result of the matcher.
+ */
 const getMatcherResult = async (
   prompt: string,
   output: string,
@@ -58,6 +65,11 @@ const getMatcherResult = async (
   }
 };
 
+/**
+ * Runs a test using the provided configuration, generates output, evaluates asserts, and saves results.
+ * @param {TestSchemaT} testConfig - The test configuration.
+ * @returns {Promise<void>} Resolves when the test and all asserts are processed and saved.
+ */
 export default async function (testConfig: TestSchemaT): Promise<void> {
   const { output } = await generateText({
     model: getModel(testConfig.provider, testConfig.model),

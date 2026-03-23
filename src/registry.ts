@@ -13,6 +13,9 @@ import { xai } from '@ai-sdk/xai';
 import CONF from './config';
 
 
+/**
+ * Map of provider names to provider functions.
+ */
 const PROVIDERS: Record<string, Function> = {
   openai,
   anthropic,
@@ -26,6 +29,13 @@ const PROVIDERS: Record<string, Function> = {
   xai,
 };
 
+
+/**
+ * Get a LanguageModel instance for a given provider and model name, using cache if available.
+ * @param {string} providerName - The provider name.
+ * @param {string} modelName - The model name.
+ * @returns {LanguageModel} The language model instance.
+ */
 export const getModel = (providerName: string, modelName: string): LanguageModel => {
   const cacheKey = `${providerName}:${modelName}`;
 
