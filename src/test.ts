@@ -38,7 +38,7 @@ const getMatcherResult = async (
         passed: result.score > threshold,
       };
     }
-    case  ASSERT_NAMES.LLM_RUBRIC: {
+    case ASSERT_NAMES.LLM_RUBRIC: {
       const result = await llmRubric(
         output,
         assert.criteria,
@@ -86,5 +86,12 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
 
   const isPassed = results.every(r => r.passed);
 
-  await saveTestResult(testConfig.run_id, testConfig.test_id, output, isPassed, results);
+  await saveTestResult(
+    testConfig.run_id,
+    testConfig.test_id!,
+    testConfig.prompt,
+    output,
+    isPassed,
+    results
+  );
 }

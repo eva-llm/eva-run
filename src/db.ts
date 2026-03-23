@@ -3,12 +3,24 @@
  * Test results are stored in append mode only.
  * For future: Redis in hot path, ClickHouse in control plane.
  */
+import { PrismaClient } from '@prisma/client';
 import { uuidv7 } from 'uuidv7';
 
-export async function saveTestResult(run_id, test_id, prompt, output, is_passed, results) {
+import { IAssertResult } from './schemas';
+
+const prisma = new PrismaClient();
+
+export async function saveTestResult(
+  run_id: string,
+  test_id: string,
+  prompt: string,
+  output: string,
+  is_passed: boolean,
+  results: IAssertResult[]
+) {
   // NOTE: Save test details for each assert. This allows to have detailed insights and metrics on asserts performance.
-  await Promise.allSettled(results.map(result =>
-    prisma.testResultDetail.create({
+  await Promise.allSettled(results.map((result: IAssertResult) =>
+    prisma.assertResult.create({
       data: {
         id: uuidv7(),
         test_id,
@@ -18,8 +30,8 @@ export async function saveTestResult(run_id, test_id, prompt, output, is_passed,
         score: result.score,
         reason: result.reason,
       }
-    }))
-  );
+    })
+  ));
   // NOTE: Save test header for tracking and filtration.
   await prisma.testResult.create({
     data: {

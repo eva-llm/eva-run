@@ -1,0 +1,28 @@
+// Prisma schema for eva-run
+// Adjust datasource and generator as needed
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AssertResult {
+  id      String  @id
+  test_id String
+  run_id  String
+  name    String
+  passed  Boolean
+  score   Float
+  reason  String
+}
+
+model TestResult {
+  id      String  @id
+  run_id  String
+  prompt  String
+  output  String
+  passed  Boolean
+}
