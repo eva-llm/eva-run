@@ -1,52 +1,33 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { Type, Static } from '@sinclair/typebox';
+import {
+  FastifyInstance,
+  FastifyRequest,
+} from 'fastify';
+import { uuidv7 } from 'uuidv7';
+import {
+  TestSchema,
+  EvalResponse,
+  type TestSchemaT,
+  type EvalResponseT,
+} from '../schemas';
 
-import { run } from '../test';
-
-export const MatcherNameEnum = Type.Union([
-  Type.Literal('g-eval'),
-  Type.Literal('llm-rubric'),
-]);
-
-export const MatcherSchema = Type.Object({
-  name: MatcherNameEnum,
-  provider: Type.String(),
-  model: Type.String(),
-  criteria: Type.String(),
-  threshold: Type.Optional(Type.Number({ default: 0.5 })),
-});
-export type MatcherSchemaType = Static<typeof MatcherSchema>;
-
-export const EvalRequest = Type.Object({
-  run_id: Type.String({ format: 'uuid' }),
-  test_id: Type.Optional(Type.String({ format: 'uuid' })),
-  provider: Type.String(),
-  model: Type.String(),
-  prompt: Type.String(),
-  asserts: Type.Array(MatcherSchema),
-});
-export type EvalRequestType = Static<typeof EvalRequest>;
-
-export const EvalResponse = Type.Object({
-  result: Type.String(),
-});
-export type EvalResponseType = Static<typeof EvalResponse>;
+import runTest from '../test';
 
 
-export async function evalHandler(
-  request: FastifyRequest<{ Body: EvalRequestType }>,
-  reply: FastifyReply
-): Promise<EvalResponseType> {
+async function evalHandler(
+  request: FastifyRequest<{ Body: TestSchemaT }>,
+): Promise<EvalResponseT> {
   const testConfig = request.body;
-  testConfig.test_id = await getTestId();
-  run(testConfig);
+
+  testConfig.test_id = uuidv7();
+  runTest(testConfig); // NOTE: We don't await this, just return test_id to client for status tracking
+
   return { test_id: testConfig.test_id };
 }
 
 export function registerEvalRoute(fastify: FastifyInstance) {
   fastify.post('/eval', {
     schema: {
-      body: EvalRequest,
+      body: TestSchema,
       response: {
         200: EvalResponse,
       },

@@ -1,21 +1,28 @@
 import { generateText } from 'ai';
-import { llmRubric, gEval } from '@eva-llm/eva-judge';
+import {
+  llmRubric,
+  gEval,
+} from '@eva-llm/eva-judge';
 
 import { getModel } from './registry';
-import { type EvalRequestType, type MatcherSchemaType } from './handlers/eval';
+import {
+  ASSERT_NAMES,
+  IAssertResult,
+  type TestSchemaT,
+  type AssertSchemaT,
+} from './schemas';
 import { saveTestResult } from './db';
 
-interface MatcherResult {
-  passed: boolean;
-  score: number;
-  reason: string;
-}
 
-const getMatcherResult = async (prompt: string, output: string, assert: MatcherSchemaType): Promise<MatcherResult> => {
+const getMatcherResult = async (
+  prompt: string,
+  output: string,
+  assert: AssertSchemaT,
+): Promise<IAssertResult> => {
   const threshold = assert.threshold ?? 0.5;
 
   switch(assert.name) {
-    case 'g-eval': {
+    case ASSERT_NAMES.GEVAL: {
       const result = await gEval(
         prompt,
         output,
@@ -25,12 +32,13 @@ const getMatcherResult = async (prompt: string, output: string, assert: MatcherS
       );
 
       return {
-        passed: result.score > threshold,
+        name: assert.name,
         score: result.score,
         reason: result.reason,
+        passed: result.score > threshold,
       };
     }
-    case 'llm-rubric': {
+    case  ASSERT_NAMES.LLM_RUBRIC: {
       const result = await llmRubric(
         output,
         assert.criteria,
@@ -39,9 +47,10 @@ const getMatcherResult = async (prompt: string, output: string, assert: MatcherS
       );
 
       return {
-        passed: result.pass && result.score > threshold,
+        name: assert.name,
         score: result.score,
         reason: result.reason,
+        passed: result.pass && result.score > threshold,
       };
     }
     default:
@@ -49,23 +58,25 @@ const getMatcherResult = async (prompt: string, output: string, assert: MatcherS
   }
 };
 
-export default async function (testConfig: EvalRequestType): Promise<void> {
+export default async function (testConfig: TestSchemaT): Promise<void> {
   const { output } = await generateText({
     model: getModel(testConfig.provider, testConfig.model),
     prompt: testConfig.prompt,
   });
 
-  const results: (MatcherResult & { name: string })[] = [];
-  const settledResults = await Promise.allSettled(testConfig.asserts.map(assert => getMatcherResult(testConfig.prompt, output, assert)));
+  const results: IAssertResult[] = [];
+  const settledResults = await Promise.allSettled(
+    testConfig.asserts.map(
+      assert => getMatcherResult(testConfig.prompt, output, assert))
+  );
 
   settledResults.forEach((settled, idx) => {
-    const assert = testConfig.asserts[idx];
-
     if (settled.status === 'fulfilled') {
-      results.push({ name: assert.name, ...settled.value });
+      results.push(settled.value);
+
     } else {
       results.push({
-        name: assert.name,
+        name: testConfig.asserts[idx].name,
         passed: false,
         score: 0,
         reason: `Matcher failed with error: ${settled.reason instanceof Error ? settled.reason.message : String(settled.reason)}`,
