@@ -15,13 +15,13 @@ import { saveTestResult } from './db';
 
 
 /**
- * Runs the matcher for a given assert and returns the result.
+ * Runs the assert for a given assert configuration and returns the result.
  * @param {string} prompt - The prompt string.
  * @param {string} output - The output string.
  * @param {AssertSchemaT} assert - The assert configuration.
- * @returns {Promise<IAssertResult>} The result of the matcher.
+ * @returns {Promise<IAssertResult>} The result of the assert.
  */
-const getMatcherResult = async (
+const getAssertResult = async (
   prompt: string,
   output: string,
   assert: AssertSchemaT,
@@ -79,7 +79,7 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   const results: IAssertResult[] = [];
   const settledResults = await Promise.allSettled(
     testConfig.asserts.map(
-      assert => getMatcherResult(testConfig.prompt, output, assert))
+      assert => getAssertResult(testConfig.prompt, output, assert))
   );
 
   settledResults.forEach((settled, idx) => {
@@ -104,6 +104,6 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     testConfig.prompt,
     output,
     isPassed,
-    results
+    results,
   );
 }

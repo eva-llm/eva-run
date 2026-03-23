@@ -1,6 +1,8 @@
 
 import Fastify from 'fastify';
+
 import { registerEvalRoute } from './handlers/eval';
+
 
 /**
  * Main entry point for the Fastify server.
