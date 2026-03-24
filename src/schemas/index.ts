@@ -42,4 +42,7 @@ export interface IAssertResult {
   passed: boolean;
   score: number;
   reason: string;
-};
+  started_at: Date;
+  finished_at: Date;
+  diff_ms: number;
+}

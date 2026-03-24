@@ -15,7 +15,7 @@ import { IAssertResult } from './schemas';
  */
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter});
+const prisma = new PrismaClient({ adapter });
 
 /**
  * Save the test result and all assert results to the database.
@@ -32,6 +32,9 @@ export async function saveTestResult(
   prompt: string,
   output: string,
   is_passed: boolean,
+  started_at: Date,
+  finished_at: Date,
+  diff_ms: number,
   results: IAssertResult[]
 ) {
   // NOTE: Save test details for each assert. This allows to have detailed insights and metrics on asserts performance.
@@ -45,6 +48,9 @@ export async function saveTestResult(
         passed: result.passed,
         score: result.score,
         reason: result.reason,
+        started_at: result.started_at,
+        finished_at: result.finished_at,
+        diff_ms: result.diff_ms,
       }
     })
   ));
@@ -56,6 +62,9 @@ export async function saveTestResult(
       prompt,
       output,
       passed: is_passed,
+      started_at,
+      finished_at,
+      diff_ms,
     }
   });
 }
