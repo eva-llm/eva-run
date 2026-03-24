@@ -23,12 +23,15 @@ model AssertResult {
 }
 
 model TestResult {
-  id         String   @id
-  run_id     String
-  prompt     String
-  output     String
-  passed     Boolean
-  started_at DateTime
-  finished_at DateTime
-  diff_ms    Int
+  id               String   @id
+  run_id           String
+  prompt           String
+  output           String
+  passed           Boolean
+  started_at       DateTime
+  finished_at      DateTime
+  diff_ms          Int
+  assert_started_at DateTime
+  assert_diff_ms    Int
+  output_diff_ms    Int
 }

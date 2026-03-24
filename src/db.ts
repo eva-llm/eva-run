@@ -35,6 +35,9 @@ export async function saveTestResult(
   started_at: Date,
   finished_at: Date,
   diff_ms: number,
+  assert_started_at: Date,
+  assert_diff_ms: number,
+  output_diff_ms: number,
   results: IAssertResult[]
 ) {
   // NOTE: Save test details for each assert. This allows to have detailed insights and metrics on asserts performance.
@@ -65,6 +68,9 @@ export async function saveTestResult(
       started_at,
       finished_at,
       diff_ms,
+      assert_started_at,
+      assert_diff_ms,
+      output_diff_ms,
     }
   });
 }

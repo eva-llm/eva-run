@@ -113,6 +113,7 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   }));
 
   const results: IAssertResult[] = [];
+  const assertStartedAt = new Date();
   const settledResults = await Promise.allSettled(
     testConfig.asserts.map(assert => getAssertResult(prompt, output, assert))
   );
@@ -136,6 +137,8 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   const isPassed = results.every(r => r.passed);
   const testFinishedAt = new Date();
   const testDiffMs = testFinishedAt.getTime() - testStartedAt.getTime();
+  const assertDiffMs = testFinishedAt.getTime() - assertStartedAt.getTime();
+  const outputDiffMs = assertStartedAt.getTime() - testStartedAt.getTime();
 
   await saveTestResult(
     testConfig.run_id,
@@ -146,6 +149,9 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     testStartedAt,
     testFinishedAt,
     testDiffMs,
+    assertStartedAt,
+    assertDiffMs,
+    outputDiffMs,
     results,
   );
 }

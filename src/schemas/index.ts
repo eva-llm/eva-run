@@ -46,3 +46,17 @@ export interface IAssertResult {
   finished_at: Date;
   diff_ms: number;
 }
+
+export interface ITestResult {
+  id: string;
+  run_id: string;
+  prompt: string;
+  output: string;
+  passed: boolean;
+  started_at: Date;
+  finished_at: Date;
+  diff_ms: number;
+  assert_started_at: Date;
+  assert_diff_ms: number;
+  output_diff_ms: number;
+}
