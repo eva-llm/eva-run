@@ -3,6 +3,7 @@
  * Test results are stored in append mode only.
  * For future: Redis in hot path, ClickHouse in control plane.
  */
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { uuidv7 } from 'uuidv7';
 
@@ -12,7 +13,9 @@ import { IAssertResult } from './schemas';
 /**
  * Prisma client instance for database operations.
  */
-const prisma = new PrismaClient();
+const connectionString = `${process.env.DATABASE_URL}`;
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter});
 
 /**
  * Save the test result and all assert results to the database.
