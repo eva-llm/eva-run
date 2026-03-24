@@ -35,6 +35,7 @@ const getAssertResult = async (
   try {
     const name = assert.name;
     const threshold = assert.threshold ?? 0.5;
+    const temperature = assert.temperature ?? 0.0; // NOTE: Recommended for judging
 
     let score: number;
     let reason: string;
@@ -48,6 +49,7 @@ const getAssertResult = async (
           assert.criteria,
           assert.provider,
           assert.model,
+          { temperature },
         )));
         passed = score > threshold;
 
@@ -59,6 +61,7 @@ const getAssertResult = async (
           assert.criteria,
           assert.provider,
           assert.model,
+          { temperature },
         ));
 
         ({ score, reason } = result);
