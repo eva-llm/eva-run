@@ -10,19 +10,25 @@ datasource db {
 }
 
 model AssertResult {
-  id      String  @id
-  test_id String
-  run_id  String
-  name    String
-  passed  Boolean
-  score   Float
-  reason  String
+  id         String   @id
+  test_id    String
+  run_id     String
+  name       String
+  passed     Boolean
+  score      Float
+  reason     String
+  started_at DateTime
+  finished_at DateTime
+  diff_ms    Int
 }
 
 model TestResult {
-  id      String  @id
-  run_id  String
-  prompt  String
-  output  String
-  passed  Boolean
+  id         String   @id
+  run_id     String
+  prompt     String
+  output     String
+  passed     Boolean
+  started_at DateTime
+  finished_at DateTime
+  diff_ms    Int
 }

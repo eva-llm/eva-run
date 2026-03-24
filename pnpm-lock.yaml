@@ -62,6 +62,9 @@ importers:
       lru-cache:
         specifier: ^11.2.7
         version: 11.2.7
+      p-limit:
+        specifier: ^7.3.0
+        version: 7.3.0
       uuidv7:
         specifier: ^1.2.1
         version: 1.2.1
@@ -603,6 +606,10 @@ packages:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
     engines: {node: '>=14.0.0'}
 
+  p-limit@7.3.0:
+    resolution: {integrity: sha512-7cIXg/Z0M5WZRblrsOla88S4wAK+zOQQWeBYfV3qJuJXMr+LnbYjaadrFaS0JILfEDPVqHyKnZ1Z/1d6J9VVUw==}
+    engines: {node: '>=20'}
+
   path-key@3.1.1:
     resolution: {integrity: sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==}
     engines: {node: '>=8'}
@@ -880,6 +887,10 @@ packages:
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
+
+  yocto-queue@1.2.2:
+    resolution: {integrity: sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==}
+    engines: {node: '>=12.20'}
 
   zeptomatch@2.1.0:
     resolution: {integrity: sha512-KiGErG2J0G82LSpniV0CtIzjlJ10E04j02VOudJsPyPwNZgGnRKQy7I1R7GMyg/QswnE4l7ohSGrQbQbjXPPDA==}
@@ -1479,6 +1490,10 @@ snapshots:
 
   on-exit-leak-free@2.1.2: {}
 
+  p-limit@7.3.0:
+    dependencies:
+      yocto-queue: 1.2.2
+
   path-key@3.1.1: {}
 
   pathe@2.0.3: {}
@@ -1705,6 +1720,8 @@ snapshots:
       isexe: 2.0.0
 
   xtend@4.0.2: {}
+
+  yocto-queue@1.2.2: {}
 
   zeptomatch@2.1.0:
     dependencies:

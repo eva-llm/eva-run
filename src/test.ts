@@ -3,6 +3,7 @@ import {
   llmRubric,
   gEval,
 } from '@eva-llm/eva-judge';
+import pLimit from 'p-limit';
 
 import { getModel } from './registry';
 import {
@@ -14,6 +15,8 @@ import {
 import { saveTestResult } from './db';
 
 
+const CONSERVATIVE_LIMIT = 200; // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
+const limit = pLimit(CONSERVATIVE_LIMIT);
 /**
  * Runs the assert for a given assert configuration and returns the result.
  * @param {string} prompt - The prompt string.
@@ -71,15 +74,15 @@ const getAssertResult = async (
  * @returns {Promise<void>} Resolves when the test and all asserts are processed and saved.
  */
 export default async function (testConfig: TestSchemaT): Promise<void> {
-  const { output } = await generateText({
+  const { output } = await limit(() => generateText({
     model: getModel(testConfig.provider, testConfig.model),
     prompt: testConfig.prompt,
-  });
+  }));
 
   const results: IAssertResult[] = [];
   const settledResults = await Promise.allSettled(
     testConfig.asserts.map(
-      assert => getAssertResult(testConfig.prompt, output, assert))
+      assert => limit(() => getAssertResult(testConfig.prompt, output, assert)))
   );
 
   settledResults.forEach((settled, idx) => {
