@@ -39,7 +39,7 @@ const PROVIDERS: Record<string, Function> = {
 export const getModel = (providerName: string, modelName: string): LanguageModel => {
   const cacheKey = `${providerName}:${modelName}`;
 
-  let model = CONF.modelCache.get(cacheKey);
+  let model = CONF.isModelCached ? CONF.modelCache.get(cacheKey) : undefined;
 
   if (!model) {
     const provider = PROVIDERS[providerName];
@@ -50,7 +50,9 @@ export const getModel = (providerName: string, modelName: string): LanguageModel
 
     model = provider(modelName);
 
-    CONF.modelCache.set(cacheKey, model);
+    if (CONF.isModelCached) {
+      CONF.modelCache.set(cacheKey, model);
+    }
   }
 
   return model!;
