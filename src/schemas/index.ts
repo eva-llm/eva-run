@@ -5,7 +5,9 @@ export const ASSERT_NAMES = {
   GEVAL: 'g-eval',
   LLM_RUBRIC: 'llm-rubric',
   EQUALS: 'equals',
+  NOT_EQUALS: 'not-equals',
   CONTAINS: 'contains',
+  NOT_CONTAINS: 'not-contains',
   REGEX: 'regex',
 } as const;
 
@@ -15,13 +17,22 @@ export const AssertNameEnum = Type.Union(
 
 export type AssertName = (typeof ASSERT_NAMES)[keyof typeof ASSERT_NAMES];
 
+/**
+ * Unified Assert Schema.
+ * We use a flat structure for simplicity and speed.
+ * Specific fields (model, provider, temperature) are used only by LLM-based matchers.
+ * Over-engineering with Discriminated Unions is avoided to keep the core lightweight.
+ */
 export const AssertSchema = Type.Object({
   name: AssertNameEnum,
-  provider: Type.String(),
-  model: Type.String(),
   criteria: Type.String(),
   threshold: Type.Optional(Type.Number({ default: 0.5 })),
+  // llm-as-judge fields
+  provider: Type.Optional(Type.String()),
+  model: Type.Optional(Type.String()),
   temperature: Type.Optional(Type.Number({ default: 0.0 })),
+  // text compare fields
+  case_sensitive: Type.Optional(Type.Boolean({ default: true })),
 });
 export type AssertSchemaT = Static<typeof AssertSchema>;
 

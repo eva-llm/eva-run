@@ -31,10 +31,13 @@ const getAssertResult = async (
   assert: AssertSchemaT,
 ): Promise<IAssertResult> => {
   const assertStartedAt = new Date();
-  const name = assert.name;
-  const criteria = assert.criteria;
-  const threshold = assert.threshold ?? 0.5;
-  const temperature = assert.temperature ?? 0.0; // NOTE: Recommended for judging
+  const { 
+    name,
+    criteria,
+    threshold = 0.5,
+    temperature = 0.0, // NOTE: Recommended for judging
+    case_sensitive: caseSensitive = true,
+  } = assert;
 
   try {  
     let score: number;
@@ -45,20 +48,58 @@ const getAssertResult = async (
     switch(name) {
       case ASSERT_NAMES.EQUALS: {
         // NOTE: if it will become complex, move to function.
-        passed = output.trim() === String(criteria);
+        passed = caseSensitive
+          ? output.trim() === String(criteria)
+          : output.trim().toLowerCase() === String(criteria).toLowerCase();
         score = passed ? 1 : 0;
         reason = passed
           ? 'Output equals the criteria.'
           : 'Output does not equal the criteria.';
+        metadata = {
+          case_sensitive: caseSensitive,
+        };
+
+        break;
+      }
+      case ASSERT_NAMES.NOT_EQUALS: {
+        passed = caseSensitive
+          ? output.trim() !== String(criteria)
+          : output.trim().toLowerCase() !== String(criteria).toLowerCase();
+        score = passed ? 1 : 0;
+        reason = passed
+          ? 'Output does not equal the criteria.'
+          : 'Output equals the criteria.';
+        metadata = {
+          case_sensitive: caseSensitive,
+        };
 
         break;
       }
       case ASSERT_NAMES.CONTAINS: {
-        passed = output.includes(String(criteria));
+        passed = caseSensitive
+          ? output.includes(String(criteria))
+          : output.toLowerCase().includes(String(criteria).toLowerCase());
         score = passed ? 1 : 0;
         reason = passed
           ? 'Output contains the criteria.'
           : 'Output does not contain the criteria.';
+        metadata = {
+          case_sensitive: caseSensitive,
+        };
+
+        break;
+      }
+      case ASSERT_NAMES.NOT_CONTAINS: {
+        passed = caseSensitive
+          ? !output.includes(String(criteria))
+          : !output.toLowerCase().includes(String(criteria).toLowerCase());
+        score = passed ? 1 : 0;
+        reason = passed
+          ? 'Output does not contain the criteria.'
+          : 'Output contains the criteria.';
+        metadata = {
+          case_sensitive: caseSensitive,
+        };
 
         break;
       }
@@ -78,14 +119,14 @@ const getAssertResult = async (
           prompt,
           output,
           criteria,
-          assert.provider,
-          assert.model,
+          assert.provider!,
+          assert.model!,
           { temperature },
         )));
         passed = score > threshold;
         metadata = {
-          provider: assert.provider,
-          model: assert.model,
+          provider: assert.provider!,
+          model: assert.model!,
           temperature,
         };
 
@@ -95,16 +136,16 @@ const getAssertResult = async (
         const result = await limit(() => llmRubric(
           output,
           criteria,
-          assert.provider,
-          assert.model,
+          assert.provider!,
+          assert.model!,
           { temperature },
         ));
 
         ({ score, reason } = result);
         passed = result.pass && score > threshold;
         metadata = {
-          provider: assert.provider,
-          model: assert.model,
+          provider: assert.provider!,
+          model: assert.model!,
           temperature,
         };
 
