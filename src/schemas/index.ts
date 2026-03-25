@@ -6,6 +6,7 @@ export const ASSERT_NAMES = {
   LLM_RUBRIC: 'llm-rubric',
   EQUALS: 'equals',
   CONTAINS: 'contains',
+  REGEX: 'regex',
 } as const;
 
 export const AssertNameEnum = Type.Union(

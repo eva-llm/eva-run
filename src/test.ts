@@ -60,6 +60,17 @@ const getAssertResult = async (
 
         break;
       }
+      case ASSERT_NAMES.REGEX: {
+        const pattern = new RegExp(String(assert.criteria));
+
+        passed = pattern.test(output);
+        score = passed ? 1 : 0;
+        reason = passed
+          ? 'Output matches regex criteria.'
+          : 'Output does not match regex criteria.';
+
+        break;
+      }
       case ASSERT_NAMES.GEVAL: {
         ({ score, reason } = await limit(() => gEval(
           prompt,
