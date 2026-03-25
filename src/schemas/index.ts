@@ -42,9 +42,12 @@ export type EvalResponseT = Static<typeof EvalResponse>;
 
 export interface IAssertResult {
   name: string;
+  criteria: string;
   passed: boolean;
   score: number;
   reason: string;
+  threshold: number;
+  metadata?: Record<string, any>;
   started_at: Date;
   finished_at: Date;
   diff_ms: number;
@@ -53,6 +56,8 @@ export interface IAssertResult {
 export interface ITestResult {
   id: string;
   run_id: string;
+  provider: string;
+  model: string;
   prompt: string;
   output: string;
   passed: boolean;

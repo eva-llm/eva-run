@@ -14,9 +14,12 @@ model AssertResult {
   test_id    String
   run_id     String
   name       String
+  criteria   String
   passed     Boolean
   score      Float
   reason     String
+  threshold  Float
+  metadata   Json?
   started_at DateTime
   finished_at DateTime
   diff_ms    Int
@@ -25,6 +28,8 @@ model AssertResult {
 model TestResult {
   id               String   @id
   run_id           String
+  provider         String
+  model            String
   prompt           String
   output           String
   passed           Boolean
