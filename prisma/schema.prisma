@@ -29,9 +29,9 @@ model TestResult {
   output           String
   passed           Boolean
   started_at       DateTime
+  assert_started_at DateTime
   finished_at      DateTime
   diff_ms          Int
-  assert_started_at DateTime
   assert_diff_ms    Int
   output_diff_ms    Int
 }

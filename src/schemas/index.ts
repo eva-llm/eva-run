@@ -54,9 +54,9 @@ export interface ITestResult {
   output: string;
   passed: boolean;
   started_at: Date;
+  assert_started_at: Date;
   finished_at: Date;
   diff_ms: number;
-  assert_started_at: Date;
   assert_diff_ms: number;
   output_diff_ms: number;
 }

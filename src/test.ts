@@ -31,12 +31,11 @@ const getAssertResult = async (
   assert: AssertSchemaT,
 ): Promise<IAssertResult> => {
   const assertStartedAt = new Date();
+  const name = assert.name;
+  const threshold = assert.threshold ?? 0.5;
+  const temperature = assert.temperature ?? 0.0; // NOTE: Recommended for judging
 
-  try {
-    const name = assert.name;
-    const threshold = assert.threshold ?? 0.5;
-    const temperature = assert.temperature ?? 0.0; // NOTE: Recommended for judging
-
+  try {  
     let score: number;
     let reason: string;
     let passed: boolean;
@@ -91,7 +90,7 @@ const getAssertResult = async (
     const assertDiffMs = assertFinishedAt.getTime() - assertStartedAt.getTime();
 
     return {
-      name: assert.name,
+      name,
       passed: false,
       score: 0,
       reason: `Assert failed with error: ${e instanceof Error ? e.message : String(e)}`,
@@ -137,24 +136,20 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     }
   });
 
-  const isPassed = results.every(r => r.passed);
   const testFinishedAt = new Date();
-  const testDiffMs = testFinishedAt.getTime() - testStartedAt.getTime();
-  const assertDiffMs = testFinishedAt.getTime() - assertStartedAt.getTime();
-  const outputDiffMs = assertStartedAt.getTime() - testStartedAt.getTime();
+  const isPassed = results.every(r => r.passed);
 
-  await saveTestResult(
-    testConfig.run_id,
-    testConfig.test_id!,
+  await saveTestResult({
+    id: testConfig.test_id!,
+    run_id: testConfig.run_id,
     prompt,
     output,
-    isPassed,
-    testStartedAt,
-    testFinishedAt,
-    testDiffMs,
-    assertStartedAt,
-    assertDiffMs,
-    outputDiffMs,
-    results,
-  );
+    passed: isPassed,
+    started_at: testStartedAt,
+    assert_started_at: assertStartedAt,
+    finished_at: testFinishedAt,
+    diff_ms: testFinishedAt.getTime() - testStartedAt.getTime(),
+    assert_diff_ms: testFinishedAt.getTime() - assertStartedAt.getTime(),
+    output_diff_ms: assertStartedAt.getTime() - testStartedAt.getTime(),
+  }, results);
 }
