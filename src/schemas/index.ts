@@ -4,6 +4,8 @@ import { Static, Type } from '@sinclair/typebox';
 export const ASSERT_NAMES = {
   GEVAL: 'g-eval',
   LLM_RUBRIC: 'llm-rubric',
+  EQUALS: 'equals',
+  CONTAINS: 'contains',
 } as const;
 
 export const AssertNameEnum = Type.Union(
