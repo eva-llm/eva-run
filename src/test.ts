@@ -32,6 +32,7 @@ const getAssertResult = async (
 ): Promise<IAssertResult> => {
   const assertStartedAt = new Date();
   const name = assert.name;
+  const criteria = assert.criteria;
   const threshold = assert.threshold ?? 0.5;
   const temperature = assert.temperature ?? 0.0; // NOTE: Recommended for judging
 
@@ -39,11 +40,12 @@ const getAssertResult = async (
     let score: number;
     let reason: string;
     let passed: boolean;
+    let metadata: Record<string, any> | undefined;
 
     switch(name) {
       case ASSERT_NAMES.EQUALS: {
         // NOTE: if it will become complex, move to function.
-        passed = output.trim() === String(assert.criteria);
+        passed = output.trim() === String(criteria);
         score = passed ? 1 : 0;
         reason = passed
           ? 'Output equals the criteria.'
@@ -52,7 +54,7 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.CONTAINS: {
-        passed = output.includes(String(assert.criteria));
+        passed = output.includes(String(criteria));
         score = passed ? 1 : 0;
         reason = passed
           ? 'Output contains the criteria.'
@@ -61,7 +63,7 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.REGEX: {
-        const pattern = new RegExp(String(assert.criteria));
+        const pattern = new RegExp(String(criteria));
 
         passed = pattern.test(output);
         score = passed ? 1 : 0;
@@ -75,19 +77,24 @@ const getAssertResult = async (
         ({ score, reason } = await limit(() => gEval(
           prompt,
           output,
-          assert.criteria,
+          criteria,
           assert.provider,
           assert.model,
           { temperature },
         )));
         passed = score > threshold;
+        metadata = {
+          provider: assert.provider,
+          model: assert.model,
+          temperature,
+        };
 
         break;
       }
       case ASSERT_NAMES.LLM_RUBRIC: {
         const result = await limit(() => llmRubric(
           output,
-          assert.criteria,
+          criteria,
           assert.provider,
           assert.model,
           { temperature },
@@ -95,6 +102,11 @@ const getAssertResult = async (
 
         ({ score, reason } = result);
         passed = result.pass && score > threshold;
+        metadata = {
+          provider: assert.provider,
+          model: assert.model,
+          temperature,
+        };
 
         break;
       }
@@ -107,9 +119,12 @@ const getAssertResult = async (
 
     return {
       name,
+      criteria,
       score,
       reason,
       passed,
+      threshold,
+      metadata,
       started_at: assertStartedAt,
       finished_at: assertFinishedAt,
       diff_ms: assertDiffMs,
@@ -121,9 +136,11 @@ const getAssertResult = async (
 
     return {
       name,
+      criteria,
       passed: false,
       score: 0,
       reason: `Assert failed with error: ${e instanceof Error ? e.message : String(e)}`,
+      threshold,
       started_at: assertStartedAt,
       finished_at: assertFinishedAt,
       diff_ms: assertDiffMs,
@@ -138,9 +155,9 @@ const getAssertResult = async (
  */
 export default async function (testConfig: TestSchemaT): Promise<void> {
   const testStartedAt = new Date();
-  const { prompt } = testConfig;
+  const { prompt, provider, model } = testConfig;
   const { output } = await limit(() => generateText({
-    model: getModel(testConfig.provider, testConfig.model),
+    model: getModel(provider, model),
     prompt,
   }));
 
@@ -155,9 +172,11 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     }
     return { // NOTE: Abnormal error
       name: testConfig.asserts[idx].name,
+      criteria: testConfig.asserts[idx].criteria,
       passed: false,
       score: 0,
       reason: `Critical Runtime Error: ${settled.reason}`,
+      threshold: 0.0,
       started_at: new Date(),
       finished_at: new Date(),
       diff_ms: 0
@@ -170,6 +189,8 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   await saveTestResult({
     id: testConfig.test_id!,
     run_id: testConfig.run_id,
+    provider,
+    model,
     prompt,
     output,
     passed: isPassed,
