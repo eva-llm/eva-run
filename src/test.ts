@@ -114,26 +114,24 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     prompt,
   }));
 
-  const results: IAssertResult[] = [];
   const assertStartedAt = new Date();
   const settledResults = await Promise.allSettled(
     testConfig.asserts.map(assert => getAssertResult(prompt, output, assert))
   );
 
-  settledResults.forEach((settled, idx) => {
+  const results = settledResults.map((settled, idx) => {
     if (settled.status === 'fulfilled') {
-      results.push(settled.value);
-    } else { // NOTE: Fatal error
-      results.push({
-        name: testConfig.asserts[idx].name,
-        passed: false,
-        score: 0,
-        reason: `Critical Runtime Error: ${settled.reason}`,
-        started_at: new Date(),
-        finished_at: new Date(),
-        diff_ms: 0
-      });
+      return settled.value;
     }
+    return { // NOTE: Abnormal error
+      name: testConfig.asserts[idx].name,
+      passed: false,
+      score: 0,
+      reason: `Critical Runtime Error: ${settled.reason}`,
+      started_at: new Date(),
+      finished_at: new Date(),
+      diff_ms: 0
+    };
   });
 
   const testFinishedAt = new Date();
