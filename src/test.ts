@@ -41,6 +41,25 @@ const getAssertResult = async (
     let passed: boolean;
 
     switch(name) {
+      case ASSERT_NAMES.EQUALS: {
+        // NOTE: if it will become complex, move to function.
+        passed = output.trim() === String(assert.criteria);
+        score = passed ? 1 : 0;
+        reason = passed
+          ? 'Output equals the criteria.'
+          : 'Output does not equal the criteria.';
+
+        break;
+      }
+      case ASSERT_NAMES.CONTAINS: {
+        passed = output.includes(String(assert.criteria));
+        score = passed ? 1 : 0;
+        reason = passed
+          ? 'Output contains the criteria.'
+          : 'Output does not contain the criteria.';
+
+        break;
+      }
       case ASSERT_NAMES.GEVAL: {
         ({ score, reason } = await limit(() => gEval(
           prompt,
