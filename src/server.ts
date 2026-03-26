@@ -41,4 +41,32 @@ const start = async () => {
   }
 };
 
+const formatError = (err: unknown): { message: string; stack?: string } => {
+  if (err instanceof Error) {
+    return { message: err.message, stack: err.stack };
+  }
+
+  if (typeof err === 'object' && err !== null) {
+    try {
+      return { message: JSON.stringify(err) };
+    } catch {
+      return { message: 'Circular or unstringifiable object' };
+    }
+  }
+
+  return { message: String(err) };
+};
+
+process.on('unhandledRejection', (err) => {
+  const { message, stack } = formatError(err);
+
+  fastify.log.error({ msg: 'Unhandled Rejection', error: message, stack });
+});
+
+process.on('uncaughtException', (err) => {
+  const { message, stack } = formatError(err);
+
+  fastify.log.error({ msg: 'Uncaught Exception', error: message, stack });
+});
+
 start();
