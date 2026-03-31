@@ -130,6 +130,11 @@ const getAssertResult = async (
           temperature,
         };
 
+        if (assert.must_fail !== undefined) {
+          metadata.must_fail = assert.must_fail;
+        }
+
+
         break;
       }
       case ASSERT_NAMES.LLM_RUBRIC: {
@@ -148,6 +153,10 @@ const getAssertResult = async (
           model: assert.model!,
           temperature,
         };
+
+        if (assert.must_fail !== undefined) {
+          metadata.must_fail = assert.must_fail;
+        }
 
         break;
       }
@@ -225,7 +234,7 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   });
 
   const testFinishedAt = new Date();
-  const isPassed = results.every(r => r.passed);
+  const isPassed = results.every(r => r.passed && (!r.metadata?.must_fail));
 
   await saveTestResult({
     id: testConfig.test_id!,
