@@ -2,6 +2,7 @@ import { generateText } from 'ai';
 import {
   llmRubric,
   gEval,
+  bEval,
 } from '@eva-llm/eva-judge';
 import pLimit from 'p-limit';
 
@@ -114,6 +115,28 @@ const getAssertResult = async (
 
         break;
       }
+      case ASSERT_NAMES.BEVAL: {
+        ({ score, reason } = await limit(() => bEval(
+          prompt,
+          output,
+          criteria,
+          assert.provider!,
+          assert.model!,
+          { temperature },
+        )));
+        passed = score > threshold;
+        metadata = {
+          provider: assert.provider!,
+          model: assert.model!,
+          temperature,
+        };
+
+        if (assert.must_fail !== undefined) {
+          metadata.must_fail = assert.must_fail;
+        }
+
+        break;
+      }
       case ASSERT_NAMES.GEVAL: {
         ({ score, reason } = await limit(() => gEval(
           prompt,
@@ -133,7 +156,6 @@ const getAssertResult = async (
         if (assert.must_fail !== undefined) {
           metadata.must_fail = assert.must_fail;
         }
-
 
         break;
       }

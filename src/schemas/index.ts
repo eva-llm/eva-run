@@ -2,6 +2,7 @@ import { Static, Type } from '@sinclair/typebox';
 
 
 export const ASSERT_NAMES = {
+  BEVAL: 'b-eval',
   GEVAL: 'g-eval',
   LLM_RUBRIC: 'llm-rubric',
   EQUALS: 'equals',
