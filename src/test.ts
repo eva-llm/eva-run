@@ -16,7 +16,7 @@ import {
 import { saveTestResult } from './db';
 
 
-const CONSERVATIVE_LIMIT = 200; // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
+const CONSERVATIVE_LIMIT = Number(process.env.LLM_PROVIDER_CONCURRENCY || 200); // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
 const limit = pLimit(CONSERVATIVE_LIMIT);
 
 /**
