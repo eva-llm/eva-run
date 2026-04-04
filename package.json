@@ -13,9 +13,19 @@
   "scripts": {
     "build": "tsc",
     "prepare": "pnpm run build",
-    "run": "node dst/server.js",
+    "server": "node dst/server.js",
     "test": "echo 'No tests yet'"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eva-llm/eva-run.git"
+  },
+  "author": "Sergei Chipiga",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eva-llm/eva-run/issues"
+  },
+  "homepage": "https://eva-llm.github.io/eva-run",
   "devDependencies": {
     "@types/node": "^25.5.0",
     "pino-pretty": "^13.1.3",
