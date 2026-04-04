@@ -1,84 +1,144 @@
 # eva-run
 
-**eva-run** is a TypeScript/Node.js service for running LLM evaluation jobs. It provides an HTTP API for submitting evaluation requests, running model outputs through a configurable set of assertions, and storing results in a database for later analysis.
+A high-performance, stateless **"Fire & Forget"** Fastify server designed to process millions of LLM prompt tests via massive horizontal scaling. Built to scale from a simple Postgres instance to a high-throughput Redis + ClickHouse pipeline. This is the industrial shredder for AI reliability testing.
 
-## Features
+---
 
-- Fastify-based HTTP server for evaluation requests
-- Supports multiple LLM providers (OpenAI, Anthropic, Google, Mistral, Bedrock, Azure, DeepSeek, Groq, Perplexity, xAI via Vercel ai-sdk)
-- Pluggable assertion system (e.g., g-eval, llm-rubric via @eva-llm/eva-judge)
-- Results stored in a database (Prisma/PostgreSQL)
-- Model caching for performance
-- Type-safe schemas using TypeBox
+## North Star Metrics
 
-## Getting Started
+- **Performance:**
+  - ~10s per G-Eval test (Cold Cache).
+  - ~6s per test (Hot Cache of Evaluation Steps).
+- **Concurrency:** Optimized for ~200+ concurrent I/O-bound connections to LLM providers.
+- **Throughput:** 1,200-2,000 tests per minute per node.
+- **Efficiency:** Processes ~1M tests in 8.3-14 hours on a **single** `eva-run` node.
+- **Scaling:** Processes ~1M tests in **2.5-4.2 minutes** with horizontal scaling (~200 nodes).<br />
+  *Note: Calculation based on the author's experience deploying on-demand clusters for 40k+ OS-GUI/Web-UI tests at Yandex.*
 
-### Prerequisites
-- Node.js >= 22
-- PostgreSQL database
+> **Disclaimer:** These represent theoretical baseline metrics. Real-world performance depends on external LLM provider rate limits, network jitter, and infrastructure overhead.
 
-### Installation
+---
 
-```bash
-npm install
-tsc
-```
-
-### Configuration
-- Edit `prisma/schema.prisma` to configure your database connection.
-- Update environment variables as needed (e.g., for API keys, database URL).
-
-### Running the Server
+## Quick Start
 
 ```bash
-node dst/server.js
+git clone https://github.com/eva-llm/eva-run
+cd eva-run
+nvm use
+pnpm i
+pnpm run server
 ```
 
-The server will listen on `http://localhost:3000` by default.
+## Architecture
+### API
 
-### API Usage
+It exposes a single high-speed endpoint: `POST /eval`.
+The server validates the payload, triggers the background evaluation process, and immediately returns a `test_id`. Results are tracked directly via the database or its replicas, ensuring zero blocking on the API level.
 
-#### POST /eval
-Submit an evaluation job:
+### Test Data Structure (JSON Schema)
 
 ```json
 {
-  "run_id": "<uuid>",
-  "provider": "openai",
-  "model": "gpt-5-mini",
-  "prompt": "Translate to French: Hello, world!",
-  "asserts": [
-    {
-      "name": "g-eval",
-      "provider": "openai",
-      "model": "gpt-4.1-mini",
-      "criteria": "Correct translation"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "run_id": { "type": "string", "format": "uuid" },
+    "test_id": { "type": "string", "format": "uuid" },
+    "provider": { "type": "string" },
+    "model": { "type": "string" },
+    "prompt": { "type": "string" },
+    "asserts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "enum": ["b-eval", "g-eval", "llm-rubric", "equals", "not-equals", "contains", "not-contains", "regex"] },
+          "criteria": { "type": "string" },
+          "threshold": { "type": "number", "default": 0.5 },
+          // llm-as-judge fields
+          "provider": { "type": "string" },
+          "model": { "type": "string" },
+          "temperature": { "type": "number", "default": 0 },
+          "must_fail": { "type": "boolean", "default": false },
+          // text compare fields
+          "case_sensitive": { "type": "boolean", "default": true }
+        },
+        "required": ["name", "criteria"]
+      }
     }
-  ]
+  },
+  "required": ["run_id", "provider", "model", "prompt", "asserts"]
 }
 ```
 
-Response:
-```json
-{ "test_id": "<uuid>" }
+### Supported asserts
+
+We cover 90% of production AI evaluation needs, with a heavy focus on LLM-as-a-Judge matchers:
+- **AI-Native:** `b-eval`, `g-eval`, `llm-rubric` (via `eva-judge`).
+- **Classic:** `equals`, `not-equals`, `contains`, `not-contains`, `regex`.
+
+## Data & Scaling Strategy
+
+The system is architected for **Append-Only** write performance.
+1. **Postgres (Current):** Sufficient for most commercial use cases.
+1. **ClickHouse (Future):** Target storage for million-test scale.
+1. **Redis (Buffer):** Planned as an ingestion proxy to batch writes into ClickHouse.
+
+**Implementation Detail:** All `id` fields utilize **UUIDv7** for superior temporal sorting and indexing efficiency compared to standard random UUIDs.
+
+## Database Schema (Prisma)
+
+```prisma
+model AssertResult {
+  id          String   @id // uuid7
+  test_id     String
+  run_id      String
+  name        String
+  criteria    String
+  passed      Boolean
+  score       Float
+  reason      String
+  threshold   Float
+  metadata    Json?
+  started_at  DateTime
+  finished_at DateTime
+  diff_ms     Int
+}
+
+model TestResult {
+  id                String   @id // uuid7
+  run_id            String
+  provider          String
+  model             String
+  prompt            String
+  output            String
+  passed            Boolean
+  started_at        DateTime
+  assert_started_at DateTime
+  finished_at       DateTime
+  diff_ms           Int
+  assert_diff_ms    Int
+  output_diff_ms    Int
+}
 ```
 
-### Database
-- Uses Prisma ORM. See `prisma/schema.prisma` for models.
-- Run `npx prisma generate` and `npx prisma migrate dev` to set up the database.
+## Industrial Philosophy
+### Dark Teaming
 
-## Project Structure
+It natively supports [Dark Teaming](https://eva-llm.github.io/dark-teaming) for measuring **Epistemic Honesty**. By using the `must_fail` flag on assertions, you can calculate **Symmetry Deviation** in real-time across massive datasets.
 
-- `src/` — TypeScript source code
-- `dst/` — Compiled JavaScript output
-- `prisma/` — Prisma schema and config
-- `package.json` — Project metadata and dependencies
+### Zero-Overhead Traceability
 
-## Development
+We intentionally omit heavy traceability layers. In `eva-run`, **the data is the trace**. If a record is missing from the database, the test is considered failed. This "minimum-evil" approach prioritizes raw throughput over logging overhead.
 
-- Build: `npm run build`
-- Type-check: `tsc`
-- (No tests yet)
+### AI-Tests Shredder
+
+The server acts as a "dumb" executor to minimize latency:
+- **Worker Isolation:** Each assertion is independent and processed via a worker pool.
+- **Optimized Paths:** We use specialized code chunks for different matchers to avoid the performance tax of complex abstractions.
+- **Validation:** JSON-schema validation is the only "inevitable evil" allowed in the hot path.
+
+---
 
 ## License
 MIT

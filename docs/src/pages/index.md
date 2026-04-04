@@ -1,5 +1,3 @@
-# eva-run
-
 A high-performance, stateless **"Fire & Forget"** Fastify server designed to process millions of LLM prompt tests via massive horizontal scaling. Built to scale from a simple Postgres instance to a high-throughput Redis + ClickHouse pipeline. This is the industrial shredder for AI reliability testing.
 
 ---
