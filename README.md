@@ -13,9 +13,21 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 - **Throughput:** 1,200-2,000 tests per minute per node.
 - **Efficiency:** Processes ~1M tests in 8.3-14 hours on a **single** `eva-run` node.
 - **Scaling:** Processes ~1M tests in **2.5-4.2 minutes** with horizontal scaling (~200 nodes).<br />
-  *Note: Calculation based on the author's experience deploying on-demand clusters for 40k+ OS-GUI/Web-UI tests at Yandex.*
+  *Note: Calculation based on the author's experience deploying on-demand clusters of this size for 40k+ OS-GUI/Web-UI tests at Yandex.*
 
 > **Disclaimer:** These represent theoretical baseline metrics. Real-world performance depends on external LLM provider rate limits, network jitter, and infrastructure overhead.
+
+---
+
+## Why are millions of tests important?
+
+In the era of the **EU AI Act** and similar regulations, massive empirical testing is perhaps the only way to demonstrate a meaningful SLA. Since AI is inherently non-deterministic, quality cannot be calculated mathematically — it can only be captured statistically through high-volume data. By running millions of tests, the quality mark becomes a statistically significant value rather than a lucky guess.
+
+## What about LLM Provider Rate Limits?
+
+`eva-run` follows the high-load philosophy: the core must be "dumb," fast, and opinionless. Any complex orchestration or business logic for rate management should be handled externally by the system distributing the tests. The server's only job is to shred through the queue at maximum speed. 
+
+To manage load, use the `LLM_PROVIDER_CONCURRENCY` environment variable. It sets the worker pool size for outgoing requests to external LLM providers (Default: `200`).
 
 ---
 
