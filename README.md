@@ -72,6 +72,8 @@ The server validates the payload, triggers the background evaluation process, an
           "model": { "type": "string" },
           "temperature": { "type": "number", "default": 0 },
           "must_fail": { "type": "boolean", "default": false },
+          // G-Eval/B-Eval fields
+          "answer_only": { "type": "boolean", "default": false },
           // text compare fields
           "case_sensitive": { "type": "boolean", "default": true }
         },

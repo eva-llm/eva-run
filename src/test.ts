@@ -38,6 +38,7 @@ const getAssertResult = async (
     threshold = 0.5,
     temperature = 0.0, // NOTE: Recommended for judging
     case_sensitive: caseSensitive = true,
+    answer_only: answerOnly = false,
   } = assert;
 
   try {  
@@ -117,8 +118,7 @@ const getAssertResult = async (
       }
       case ASSERT_NAMES.BEVAL: {
         ({ score, reason } = await limit(() => bEval(
-          prompt,
-          output,
+          answerOnly ? output : { query: prompt, answer: output },
           criteria,
           assert.provider!,
           assert.model!,
@@ -139,8 +139,7 @@ const getAssertResult = async (
       }
       case ASSERT_NAMES.GEVAL: {
         ({ score, reason } = await limit(() => gEval(
-          prompt,
-          output,
+          answerOnly ? output : { query: prompt, answer: output },
           criteria,
           assert.provider!,
           assert.model!,

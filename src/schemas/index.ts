@@ -33,6 +33,8 @@ export const AssertSchema = Type.Object({
   model: Type.Optional(Type.String()),
   temperature: Type.Optional(Type.Number({ default: 0.0 })),
   must_fail: Type.Optional(Type.Boolean({ default: false })),
+  // G-Eval/B-Eval fields
+  answer_only: Type.Optional(Type.Boolean({ default: false })),
   // text compare fields
   case_sensitive: Type.Optional(Type.Boolean({ default: true })),
 });
