@@ -15,18 +15,24 @@ import runTest from '../test';
 
 /**
  * Handles evaluation requests by running a test and returning the test ID.
- * @param {FastifyRequest<{ Body: TestSchemaT }>} request - The Fastify request object.
+ * @param {FastifyRequest<{ Body: TestSchemaT[] }>} request - The Fastify request object.
  * @returns {Promise<EvalResponseT>} The response containing the test ID.
  */
 async function evalHandler(
-  request: FastifyRequest<{ Body: TestSchemaT }>,
+  request: FastifyRequest<{ Body: TestSchemaT[] }>,
 ): Promise<EvalResponseT> {
-  const testConfig = request.body;
+  const testConfigs = request.body;
+  const testIds: string[] = [];
 
-  testConfig.test_id = uuidv7();
-  runTest(testConfig); // NOTE: We don't await this, just return test_id to client for status tracking
+  for (const testConfig of testConfigs) {
+    const testId = uuidv7();
 
-  return { test_id: testConfig.test_id };
+    testConfig.test_id = testId;
+    testIds.push(testId);
+    runTest(testConfig); // NOTE: We don't await this, just return test_id[] to client for status tracking
+  }
+
+  return { test_ids: testIds };
 }
 
 /**

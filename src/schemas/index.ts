@@ -51,7 +51,7 @@ export const TestSchema = Type.Object({
 export type TestSchemaT = Static<typeof TestSchema>;
 
 export const EvalResponse = Type.Object({
-  test_id: Type.String({ format: 'uuid' }),
+  test_ids: Type.Array(Type.String({ format: 'uuid' })),
 });
 export type EvalResponseT = Static<typeof EvalResponse>;
 

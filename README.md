@@ -55,43 +55,44 @@ pnpm run server
 ### API
 
 It exposes a single high-speed endpoint: `POST /eval`.
-The server validates the payload, triggers the background evaluation process, and immediately returns a `test_id`. Results are tracked directly via the database or its replicas, ensuring zero blocking on the API level.
+The server accepts an **array of test configurations**, validates the payload, triggers the background evaluation process for each item, and immediately returns an array of `test_ids`. This batch-first approach minimizes HTTP overhead and is designed for massive ingestion. Results are tracked directly via the database or its replicas, ensuring zero blocking on the API level.
 
 ### Test Data Structure (JSON Schema)
 
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "properties": {
-    "run_id": { "type": "string", "format": "uuid" },
-    "test_id": { "type": "string", "format": "uuid" },
-    "provider": { "type": "string" },
-    "model": { "type": "string" },
-    "prompt": { "type": "string" },
-    "asserts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": { "enum": ["b-eval", "g-eval", "llm-rubric", "equals", "not-equals", "contains", "not-contains", "regex"] },
-          "criteria": { "type": "string" },
-          "threshold": { "type": "number", "default": 0.5 },
-          // llm-as-judge fields
-          "provider": { "type": "string" },
-          "model": { "type": "string" },
-          "temperature": { "type": "number", "default": 0 },
-          "must_fail": { "type": "boolean", "default": false },
-          // G-Eval/B-Eval fields
-          "answer_only": { "type": "boolean", "default": false },
-          // text compare fields
-          "case_sensitive": { "type": "boolean", "default": true }
-        },
-        "required": ["name", "criteria"]
+  "type": "array",
+  "description": "Batch of evaluation tests",
+  "items": {
+    "type": "object",
+    "properties": {
+      "run_id": { "type": "string", "format": "uuid", "description": "Global ID for the entire test suite run" },
+      "test_id": { "type": "string", "format": "uuid", "description": "Optional. If not provided, eva-run generates a UUIDv7" },
+      "provider": { "type": "string" },
+      "model": { "type": "string" },
+      "prompt": { "type": "string" },
+      "asserts": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "enum": ["b-eval", "g-eval", "llm-rubric", "equals", "not-equals", "contains", "not-contains", "regex"] },
+            "criteria": { "type": "string" },
+            "threshold": { "type": "number", "default": 0.5 },
+            "provider": { "type": "string" },
+            "model": { "type": "string" },
+            "temperature": { "type": "number", "default": 0 },
+            "must_fail": { "type": "boolean", "default": false },
+            "answer_only": { "type": "boolean", "default": false },
+            "case_sensitive": { "type": "boolean", "default": true }
+          },
+          "required": ["name", "criteria"]
+        }
       }
-    }
-  },
-  "required": ["run_id", "provider", "model", "prompt", "asserts"]
+    },
+    "required": ["run_id", "provider", "model", "prompt", "asserts"]
+  }
 }
 ```
 
