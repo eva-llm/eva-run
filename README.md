@@ -29,6 +29,16 @@ This service follows the high-load philosophy: the core must be "dumb," fast, an
 
 To manage load, use the `LLM_PROVIDER_CONCURRENCY` environment variable. It sets the worker pool size for outgoing requests to external LLM providers (Default: `200`).
 
+## AI Testing Pyramid
+
+`eva-run` is the **Unit Testing layer** of the EVA-LLM ecosystem.
+
+In a professional AI QA pipeline, you need different tools for different scales:
+* **Complex Scenarios (Agentic/Integration):** Use [`llm-as-a-jest`](https://eva-llm.github.io/llm-as-a-jest) for testing tool-calling, JSON structures, and multi-step flows where deep orchestration is required.
+* **Massive Validation (Statistical):** Use `eva-run` for high-volume, "atomic" probes.
+
+The goal of `eva-run` is to verify - at scale - that the model can answer correctly, logically, and consistently. It's not about complex business logic; it's about **statistical significance**. By stripping away the overhead of heavy test runners, we focus on one thing: hammering the LLM with millions of prompts to extract a **Measurable SLA**.
+
 ---
 
 ## Quick Start
