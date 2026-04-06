@@ -17,7 +17,7 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 
 > **Disclaimer:** These represent theoretical baseline metrics. Real-world performance depends on external LLM provider rate limits, network jitter, and infrastructure overhead.
 
-**Down-to-earth** calculation - accounting rate limits and other factors - for LLM Provider with ~100 connections - **1M** tests in ~**1d** (600-1000 tests per minute).
+**Down-to-earth** calculation - accounting rate limits, moderate prompts, and other factors - for LLM Provider with ~100 connections - **1M** tests in ~**1d** (600-1000 tests per minute).
 
 ---
 
