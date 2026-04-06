@@ -42,7 +42,10 @@ async function evalHandler(
 export function registerEvalRoute(fastify: FastifyInstance) {
   fastify.post('/eval', {
     schema: {
-      body: TestSchema,
+      body: {
+        type: 'array',
+        items: TestSchema,
+      },
       response: {
         200: EvalResponse,
       },

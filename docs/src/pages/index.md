@@ -1,4 +1,4 @@
-A high-performance, stateless **"Fire & Forget"** Fastify server designed to process thousands and millions of LLM prompt tests via massive horizontal scaling. Built to scale from a simple Postgres instance to a high-throughput Redis + ClickHouse pipeline. This is the industrial shredder for AI reliability testing.
+A high-performance, stateless **"Fire & Forget"** Fastify server designed to process thousands and millions of LLM prompt tests via massive horizontal scaling. Built to scale from a simple Postgres instance to a high-throughput Redis + ClickHouse pipeline. This is the Industrial Shredder for AI reliability testing.
 
 ---
 
@@ -51,6 +51,8 @@ cd eva-run
 nvm use
 pnpm i
 export DATABASE_URL="postgresql://..."
+npx prisma db push
+npx prisma generate
 pnpm run server
 ```
 
@@ -64,6 +66,53 @@ pnpm run server
 > 3. Define the model to be used as a **Judge** for your endpoint testing.
 >
 > To ensure your Judge is reliable and unbiased, we strongly recommend performing [Dark Teaming](https://eva-llm.github.io/dark-teaming) to measure **Symmetry Deviation**. `eva-run` supports Dark Teaming natively via the `must_fail` field — refer to the **Assertions** documentation below for implementation details.
+
+## Performance Benchmark: The "Industrial Shredder" Test
+
+#### 📊 [PERFORMANCE LOG: eva-run single "Industrial Shredder" node - 1000 tests]
+
+**Testing environment:** Local machine
+**OpenAI Account:** Tier 1
+**Concurrency pool:** LLM_PROVIDER_CONCURRENCY=10
+
+#### 🧪 Test Payload:
+
+```json
+{
+  "run_id": "<UUIDv7>",
+  "provider": "openai",
+  "model": "gpt-5-mini",
+  "prompt": "Question #[id]: What is the capital of France?",
+  "asserts": [
+    {
+      "name": "b-eval",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "criteria": "the answer should be relevant to the question"
+    }
+  ]
+}
+```
+
+#### ⏱️ Results for 1000 iterations (All tests passed):
+
+**Total execution time:** ~520 seconds (8min 40sec)
+**Effective time per test:** ~5.2s (including concurrency workers pool overhead). This looks correlated initial estimates.
+
+Longest test (+ worker waiting) - 519.973s
+Shortest test (+ worker waiting) - 197.196s
+
+#### ⏱️ NOTE! Results for first 999 iterations (one test was stuck in ~3 mins):
+
+**Total execution time:** ~340 seconds (5min 40sec)
+**Effective time per test:** ~3.4s
+
+#### 📉 Statistical Variance (Response Drift):
+
+- "The capital of France is Paris." - 913 times
+- "Paris." - 87 times
+
+Even in a deterministic prompt, we see a 8.7% variance in output format. This is exactly why **statistical validation is a must for Enterprise AI**.
 
 ## Architecture
 ### API
