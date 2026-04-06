@@ -2,9 +2,9 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 
 ---
 
-## North Star Metrics
+## Performance Potential
 
-- **Performance:**
+- **Latency:**
   - ~10s per G-Eval test (Cold Cache).
   - ~6s per test (Hot Cache of Evaluation Steps).
 - **Concurrency:** Optimized for ~200+ concurrent I/O-bound connections to LLM providers.
