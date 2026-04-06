@@ -69,13 +69,15 @@ pnpm run server
 
 ## Performance Benchmark: The "Industrial Shredder" Test
 
-#### 📊 [PERFORMANCE LOG: eva-run single "Industrial Shredder" node - 1000 tests]
+### 📊 [PERFORMANCE LOG: 1000 tests - 1 node eva-run]
 
 **Testing environment:** Local machine
+
 **OpenAI Account:** Tier 1
+
 **Concurrency pool:** LLM_PROVIDER_CONCURRENCY=10
 
-#### 🧪 Test Payload:
+#### 🧪 Test Payload
 
 ```json
 {
@@ -94,20 +96,23 @@ pnpm run server
 }
 ```
 
-#### ⏱️ Results for 1000 iterations (All tests passed):
+#### ⏱️ Results for 1000 iterations (All tests passed)
 
 **Total execution time:** ~520 seconds (8min 40sec)
+
 **Effective time per test:** ~5.2s (including concurrency workers pool overhead). This looks correlated initial estimates.
 
-Longest test (+ worker waiting) - 519.973s
-Shortest test (+ worker waiting) - 197.196s
+**Longest test** (+ worker waiting) - 519.973s
 
-#### ⏱️ NOTE! Results for first 999 iterations (one test was stuck in ~3 mins):
+**Shortest test** (+ worker waiting) - 197.196s
+
+#### ⏱️ NOTE! Results for first 999 iterations (one test was stuck in ~3 mins)
 
 **Total execution time:** ~340 seconds (5min 40sec)
+
 **Effective time per test:** ~3.4s
 
-#### 📉 Statistical Variance (Response Drift):
+#### 📉 Statistical Variance (Response Drift)
 
 - "The capital of France is Paris." - 913 times
 - "Paris." - 87 times
