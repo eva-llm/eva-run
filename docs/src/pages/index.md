@@ -51,8 +51,8 @@ cd eva-run
 nvm use
 pnpm i
 export DATABASE_URL="postgresql://..."
-npx prisma db push
-npx prisma generate
+pnpx prisma db push
+pnpx prisma generate
 pnpm run server
 ```
 
@@ -67,9 +67,9 @@ pnpm run server
 >
 > To ensure your Judge is reliable and unbiased, we strongly recommend performing [Dark Teaming](https://eva-llm.github.io/dark-teaming) to measure **Symmetry Deviation**. `eva-run` supports Dark Teaming natively via the `must_fail` field — refer to the **Assertions** documentation below for implementation details.
 
-## Performance Benchmark: The "Industrial Shredder" Test
+## Performance Benchmark
 
-### 📊 [PERFORMANCE LOG: 1000 tests - 1 node eva-run]
+### 📊 [1000 tests - 1 node eva-run]
 
 **Testing environment:** Local machine
 
