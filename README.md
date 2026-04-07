@@ -19,56 +19,6 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 
 **Down-to-earth** calculation - accounting rate limits, moderate prompts, and other factors - for LLM Provider with ~100 connections - **1M** tests in ~**1d** (600-1000 tests per minute).
 
----
-
-## Where is it in AI Testing Pyramid?
-
-`eva-run` is the **Unit Testing layer** of the EVA-LLM ecosystem.
-
-In a professional AI QA pipeline, you need different tools for different scales:
-* **Complex Scenarios (Agentic/Integration):** Use [`llm-as-a-jest`](https://eva-llm.github.io/llm-as-a-jest) for testing JSON structures, tool-calling, and multi-step flows where deep orchestration is required.
-* **Massive Validation (Statistical):** Use `eva-run` for high-volume, "atomic" probes.
-
-The goal of `eva-run` is to verify - at scale - that the model can answer correctly, logically, and consistently. It's not about complex business logic; it's about **statistical significance**. By stripping away the overhead of heavy test runners, we focus on one thing: hammering the LLM with thousands and millions of prompts to extract a **Measurable SLA**.
-
-## Why are millions of tests important?
-
-In the era of the **EU AI Act** and similar regulations, massive empirical testing is perhaps the only way to demonstrate a meaningful SLA. Since AI is inherently non-deterministic, quality cannot be calculated mathematically — it can only be captured statistically through high-volume data. By running millions of tests, the quality mark becomes a statistically significant value rather than a lucky guess.
-
-The figure of **one million tests** is not an arbitrary number; it is a technical necessity for reliability. To ensure that an AI system is stable, a single test case must be validated **multiple times (dozens or even hundreds of iterations)**. This is the only way to confirm that responses do not break statistically, especially when using **non-zero temperatures**.
-
-## What about LLM Provider Rate Limits?
-
-This service follows the high-load philosophy: the core must be "dumb," fast, and opinionless. Any complex orchestration or business logic for rate management should be handled externally by the system distributing the tests. The server's only job is to shred through the queue at maximum speed.
-
-To manage load, use the `LLM_PROVIDER_CONCURRENCY` environment variable. It sets the worker pool size for outgoing requests to external LLM providers (Default: `200`).
-
----
-
-## Quick Start
-
-```bash
-git clone https://github.com/eva-llm/eva-run
-cd eva-run
-nvm use
-pnpm i
-export DATABASE_URL="postgresql://..."
-pnpx prisma db push
-pnpx prisma generate
-pnpm run server
-```
-
-> [!IMPORTANT]
-> **Advanced Validation & Custom Endpoints**
->
-> If you need to go beyond standard prompt testing and want to validate your specific AI endpoints for production reliability, it is recommended to implement a custom **AI SDK Vercel Adapter**. 
-> 
-> 1. Follow the [Custom Providers guide](https://ai-sdk.dev/providers/community-providers/custom-providers) to develop your adapter.
-> 2. Register it in `src/registry.ts`.
-> 3. Define the model to be used as a **Judge** for your endpoint testing.
->
-> To ensure your Judge is reliable and unbiased, we strongly recommend performing [Dark Teaming](https://eva-llm.github.io/dark-teaming) to measure **Symmetry Deviation**. `eva-run` supports Dark Teaming natively via the `must_fail` field — refer to the **Assertions** documentation below for implementation details.
-
 ## Performance Benchmark
 
 ### 📊 [1000 tests - 1 node eva-run]
@@ -119,7 +69,57 @@ pnpm run server
 - "The capital of France is Paris." - 913 times
 - "Paris." - 87 times
 
-Even in a deterministic prompt, we see a 8.7% variance in output format. This is exactly why **statistical validation is a must for Enterprise AI**.
+Even in a semantically identical prompt, we see a 8.7% variance in output format. This is exactly why **statistical validation is a must for Enterprise AI**.
+
+---
+
+## Where is it in AI Testing Pyramid?
+
+`eva-run` is the **Unit Testing layer** of the EVA-LLM ecosystem.
+
+In a professional AI QA pipeline, you need different tools for different scales:
+* **Complex Scenarios (Agentic/Integration):** Use [`llm-as-a-jest`](https://eva-llm.github.io/llm-as-a-jest) for testing JSON structures, tool-calling, and multi-step flows where deep orchestration is required.
+* **Massive Validation (Statistical):** Use `eva-run` for high-volume, "atomic" probes.
+
+The goal of `eva-run` is to verify - at scale - that the model can answer correctly, logically, and consistently. It's not about complex business logic; it's about **statistical significance**. By stripping away the overhead of heavy test runners, we focus on one thing: hammering the LLM with thousands and millions of prompts to extract a **Measurable SLA**.
+
+## Why are millions of tests important?
+
+In the era of the **EU AI Act** and similar regulations, massive empirical testing is perhaps the only way to demonstrate a meaningful SLA. Since AI is inherently non-deterministic, quality cannot be calculated mathematically — it can only be captured statistically through high-volume data. By running millions of tests, the quality mark becomes a statistically significant value rather than a lucky guess.
+
+The figure of **one million tests** is not an arbitrary number; it is a technical necessity for reliability. To ensure that an AI system is stable, a single test case must be validated **multiple times (dozens or even hundreds of iterations)**. This is the only way to confirm that responses do not break statistically, especially when using **non-zero temperatures**.
+
+## What about LLM Provider Rate Limits?
+
+This service follows the high-load philosophy: the core must be "dumb," fast, and opinionless. Any complex orchestration or business logic for rate management should be handled externally by the system distributing the tests. The server's only job is to shred through the queue at maximum speed.
+
+To manage load, use the `LLM_PROVIDER_CONCURRENCY` environment variable. It sets the worker pool size for outgoing requests to external LLM providers (Default: `200`).
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/eva-llm/eva-run
+cd eva-run
+nvm use
+pnpm i
+export DATABASE_URL="postgresql://..."
+pnpx prisma db push
+pnpx prisma generate
+pnpm run server
+```
+
+> [!IMPORTANT]
+> **Advanced Validation & Custom Endpoints**
+>
+> If you need to go beyond standard prompt testing and want to validate your specific AI endpoints for production reliability, it is recommended to implement a custom **AI SDK Vercel Adapter**. 
+> 
+> 1. Follow the [Custom Providers guide](https://ai-sdk.dev/providers/community-providers/custom-providers) to develop your adapter.
+> 2. Register it in `src/registry.ts`.
+> 3. Define the model to be used as a **Judge** for your endpoint testing.
+>
+> To ensure your Judge is reliable and unbiased, we strongly recommend performing [Dark Teaming](https://eva-llm.github.io/dark-teaming) to measure **Symmetry Deviation**. `eva-run` supports Dark Teaming natively via the `must_fail` field — refer to the **Assertions** documentation below for implementation details.
 
 ## Architecture
 ### API
