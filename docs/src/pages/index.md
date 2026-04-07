@@ -27,7 +27,7 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 
 **Concurrency pool:** LLM_PROVIDER_CONCURRENCY=10
 
-#### 🧪 Test Payload
+#### 🧪 Test Payload:
 
 ```json
 {
@@ -46,7 +46,7 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 }
 ```
 
-#### ⏱️ Results for 1000 iterations (All tests passed)
+#### ⏱️ Results for 1000 iterations (All tests passed):
 
 **Total execution time:** ~520 seconds (8min 40sec)
 
@@ -56,13 +56,13 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 
 **Shortest test** (+ worker waiting) - 197.196s
 
-#### ⏱️ NOTE! Results for first 999 iterations (one test was stuck in ~3 mins)
+#### ⏱️ NOTE! Results for first 999 iterations (one test was stuck in ~3 mins):
 
 **Total execution time:** ~340 seconds (5min 40sec)
 
 **Effective time per test:** ~3.4s
 
-#### 📉 Statistical Variance (Response Drift)
+#### 📉 Statistical Variance (Response Drift):
 
 - "The capital of France is Paris." - 913 times
 - "Paris." - 87 times
