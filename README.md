@@ -48,6 +48,8 @@ A high-performance, stateless **"Fire & Forget"** Fastify server designed to pro
 }
 ```
 
+Each test with B-Eval/G-Eval assert consumes ~1000-1500 LLM tokens.
+
 #### ⏱️ Results for 1000 iterations (All tests passed):
 
 **Total execution time:** ~520 seconds (8min 40sec)
