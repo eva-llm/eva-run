@@ -83,3 +83,8 @@ export interface ITestResult {
   assert_diff_ms: number;
   output_diff_ms: number;
 }
+
+export type TSaveTestResult = (
+  testResult: ITestResult,
+  assertResults: IAssertResult[],
+) => Promise<void>;
