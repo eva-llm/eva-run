@@ -44,7 +44,7 @@
     "@ai-sdk/openai": "^3.0.41",
     "@ai-sdk/perplexity": "^3.0.26",
     "@ai-sdk/xai": "^3.0.73",
-    "@eva-llm/eva-judge": "^1.0.2",
+    "@eva-llm/eva-judge": "^1.0.3",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "@sinclair/typebox": "^0.34.48",
