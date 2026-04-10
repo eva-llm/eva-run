@@ -233,6 +233,52 @@ The server acts as a "dumb" executor to minimize latency:
 - **Optimized Paths:** We use specialized code chunks for different matchers to avoid the performance tax of complex abstractions.
 - **Validation:** JSON-schema validation is the only "inevitable evil" allowed in the hot path.
 
+## AI Metrology
+
+The goal of **AI Metrology** is not to test how smart the LLM model or agent is, but to test how **sustainable** and **stable** it is for **business**.
+
+### Consistency Index
+
+Instead of looking at whether the model guessed correctly, we look at the **variance**.
+
+**Test:** Ask the same ambiguous question ~1000 times at `Temperature > 0`.
+
+**Metric:** Entropy / Mode Frequency (frequency of the most popular answer).
+
+**Why:** If a model chooses option "A" **99%** of the time when asked an ambiguous question, it has a built-in bias that makes it predictable. If **50/50** is an "engineering nightmare", such a model should not be automated without human intervention.
+
+### Temperature Sensitivity
+
+Assessing the impact of temperature **not** on creativity, **but** on **logic**.
+
+**Method:** We plot a graph of **Сonsistency** versus **Temperature**.
+
+**Insight:** Every task has a "breaking point." For example, logic is rock-solid up to `T=0.3`, but at `T=0.5`, it starts to fall apart.
+
+**SLA:** We provide the client with a report: _"For this task, the safe temperature threshold is 0.4. Above that, the risk of unpredictable behavior increases exponentially."_
+
+### Binary Drift
+
+The most sensitive tests are **provocation** tests.
+
+**Method:** We take a trick question where there is **no single** correct answer.
+
+**Metric:** We look at how **confidently** the model holds its ground (using `frequency` in the batch).
+
+**Result:** We measure **Robustness**. If the model easily "changes its mind" or hesitates, it is an unstable component of the system.
+
+### Semantic Anchor
+
+Assessing how the model is consistent across open questions.
+
+> Semantic consistency is the key to reliable down-stream processing.
+
+**Method:** We take a simple factual question, for example: "What is the capital of France?"
+
+**Metric:** Here we use Levenstein Distance or Exact Match after normalization (converting to lowercase, removing spaces).
+
+**Result:** If in response to the question "What is the capital of France?", the model answered "The capital of France is Paris." 900 times, and just "Paris" 100 times, this is a **consistency error** for an engineer. We should highlight this: the model is changing the output format, which will break the parser.
+
 ---
 
 ## License
