@@ -15,6 +15,7 @@ import {
   type AssertSchemaT,
 } from './schemas';
 import { saveTestResult } from './db';
+import { xnor } from 'utils';
 
 
 const CONSERVATIVE_LIMIT = Number(process.env.LLM_PROVIDER_CONCURRENCY || 200); // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
@@ -259,7 +260,7 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   });
 
   const testFinishedAt = new Date();
-  const isPassed = results.every(r => r.passed && (!r.metadata?.must_fail));
+  const isPassed = results.every(r => xnor(r.passed, !r.metadata?.must_fail));
 
   await saveTestResult({
     id: testConfig.test_id!,
