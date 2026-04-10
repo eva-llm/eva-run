@@ -10,12 +10,12 @@ import pLimit from 'p-limit';
 import { getModel } from './registry';
 import {
   ASSERT_NAMES,
-  IAssertResult,
+  type IAssertResult,
   type TestSchemaT,
   type AssertSchemaT,
 } from './schemas';
 import { saveTestResult } from './db';
-import { xnor } from 'utils';
+import { xnor } from './utils';
 
 
 const CONSERVATIVE_LIMIT = Number(process.env.LLM_PROVIDER_CONCURRENCY || 200); // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
