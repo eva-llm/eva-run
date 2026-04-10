@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { generateText } from 'ai';
 import {
   llmRubric,
@@ -18,6 +19,8 @@ import { saveTestResult } from './db';
 
 const CONSERVATIVE_LIMIT = Number(process.env.LLM_PROVIDER_CONCURRENCY || 200); // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
 const limit = pLimit(CONSERVATIVE_LIMIT);
+const getHashId = () => crypto.randomBytes(16).toString('hex'); // NOTE: 16 bytes = 128 bits of entropy, should be sufficient for uniqueness in prompts
+
 
 /**
  * Runs the assert for a given assert configuration and returns the result.
@@ -229,6 +232,7 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   const { prompt, provider, model } = testConfig;
   const { output } = await limit(() => generateText({
     model: getModel(provider, model),
+    system: `Request #${getHashId()}`,
     prompt,
   }));
 

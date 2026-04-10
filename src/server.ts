@@ -1,4 +1,3 @@
-
 import Fastify from 'fastify';
 
 import { registerEvalRoute } from './handlers/eval';
