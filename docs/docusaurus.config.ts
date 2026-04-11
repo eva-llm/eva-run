@@ -81,7 +81,7 @@ const config: Config = {
     },
     footer: {
       style: 'dark',
-      copyright: `Copyright © ${new Date().getFullYear()} EVA-LLM`,
+      copyright: `EVA-LLM · MIT License · Copyright © ${new Date().getFullYear()}`,
     },
     prism: {
       theme: prismThemes.github,
