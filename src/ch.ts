@@ -10,7 +10,7 @@ const redis = new Redis(process.env.REDIS_URL!, {
 });
 
 const clickHouse = createClient({
-  host: process.env.CLICKHOUSE_HOST!,
+  host: process.env.CLICKHOUSE_URL!,
 });
 
 const SEC = 1000;

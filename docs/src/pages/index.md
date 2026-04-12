@@ -229,6 +229,31 @@ model TestResult {
 
 ---
 
+## Enterprise-Grade Ingestion
+For high-volume production environments where performance is critical, `eva-run` supports a decoupled ingestion architecture. Instead of direct database writes during the evaluation, the system utilizes a **Buffered Batching** strategy.
+
+### ClickHouse & Redis Integration
+To enable high-throughput data persistence:
+1. Ensure the `REDIS_URL` and `CLICKHOUSE_URL` environment variables are provided.
+1. Use the specialized runtime mode:
+
+```Bash
+pnpm run ch
+# or for production process management:
+pnpm run start
+```
+
+### How it works (The Hot Path)
+- **Zero-Latency Writes:** During the evaluation "hot path", results are pushed directly into `Redis` streams/lists instead of a relational database. This ensures that the `eva-run` engine is never I/O-bound by disk or SQL transactions.
+
+- **Asynchronous Batching:** A dedicated **Control Plane Worker** pulls data from `Redis` in the background, aggregates it into optimized batches, and performs bulk inserts into `ClickHouse`.
+
+- **Scalability:** This architecture allows you to handle millions of test assertions without impacting the responsiveness of the evaluation engine or the visual dashboard.
+
+**Note:** This mode is recommended for users running >100,000 assertions per session or requiring long-term analytical storage for historical AI performance data.
+
+---
+
 ## Industrial Philosophy
 ### Dark Teaming
 
