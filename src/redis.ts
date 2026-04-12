@@ -15,7 +15,7 @@ export const getRedis = () => new Redis(process.env.REDIS_URL!, {
 export function saveTestResultRedis(
   redis: Redis,
 ): TSaveTestResult {
-  return async function saveTestResultRedis(
+  return async function (
     testResult: ITestResult,
     assertResults: IAssertResult[]
   ) {
