@@ -13,9 +13,6 @@ import { xai } from '@ai-sdk/xai';
 import CONF from './config';
 
 
-/**
- * Map of provider names to provider functions.
- */
 const PROVIDERS: Record<string, Function> = {
   openai,
   anthropic,
@@ -28,7 +25,6 @@ const PROVIDERS: Record<string, Function> = {
   perplexity,
   xai,
 };
-
 
 /**
  * Get a LanguageModel instance for a given provider and model name, using cache if available.
