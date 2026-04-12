@@ -23,7 +23,7 @@ export function saveTestResultPg(
     assertResults: IAssertResult[]
   ) {
     const { run_id, id: test_id } = testResult;
-
+    // NOTE: No transactions in hot path, any cleanup of orphans asserts only in control plane
     await prisma.assertResult.createMany({
       data: assertResults.map((result) => ({
         id: uuidv7(),

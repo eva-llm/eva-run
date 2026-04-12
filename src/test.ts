@@ -6,6 +6,7 @@ import {
   bEval,
 } from '@eva-llm/eva-judge';
 import pLimit from 'p-limit';
+import { LRUCache } from 'lru-cache';
 
 import { getModel } from './registry';
 import {
@@ -15,13 +16,14 @@ import {
   type AssertSchemaT,
 } from './schemas';
 import { saveTestResult } from './db';
-import { xnor } from './utils';
+import { yieldEventLoop, xnor } from './utils';
 
 
-const CONSERVATIVE_LIMIT = Number(process.env.LLM_PROVIDER_CONCURRENCY || 200); // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
-const limit = pLimit(CONSERVATIVE_LIMIT);
+let syncOpsCounter = 0;
+const SYNC_OPS_THRESHOLD = 1000; // NOTE: replace with env var if it needs
+const regexCache = new LRUCache<string, RegExp>({ max: 1000 }); // NOTE: replace with env var if it needs
+const limit = pLimit(Number(process.env.LLM_PROVIDER_CONCURRENCY || 200)); // NOTE: To avoid overwhelming the system with too many concurrent requests, especially when using resource-intensive providers.
 const getHashId = () => crypto.randomBytes(16).toString('hex'); // NOTE: 16 bytes = 128 bits of entropy, should be sufficient for uniqueness in prompts
-
 
 /**
  * Runs the assert for a given assert configuration and returns the result.
@@ -53,6 +55,12 @@ const getAssertResult = async (
 
     switch(name) {
       case ASSERT_NAMES.EQUALS: {
+        // NOTE: performance over elegance - no extra async function
+        syncOpsCounter++;
+        if (syncOpsCounter >= SYNC_OPS_THRESHOLD) {
+          syncOpsCounter = 0;
+          await yieldEventLoop();
+        }
         // NOTE: if it will become complex, move to function.
         passed = caseSensitive
           ? output.trim() === String(criteria)
@@ -68,6 +76,12 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.NOT_EQUALS: {
+        syncOpsCounter++;
+        if (syncOpsCounter >= SYNC_OPS_THRESHOLD) {
+          syncOpsCounter = 0;
+          await yieldEventLoop();
+        }
+
         passed = caseSensitive
           ? output.trim() !== String(criteria)
           : output.trim().toLowerCase() !== String(criteria).toLowerCase();
@@ -82,6 +96,12 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.CONTAINS: {
+        syncOpsCounter++;
+        if (syncOpsCounter >= SYNC_OPS_THRESHOLD) {
+          syncOpsCounter = 0;
+          await yieldEventLoop();
+        }
+
         passed = caseSensitive
           ? output.includes(String(criteria))
           : output.toLowerCase().includes(String(criteria).toLowerCase());
@@ -96,6 +116,12 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.NOT_CONTAINS: {
+        syncOpsCounter++;
+        if (syncOpsCounter >= SYNC_OPS_THRESHOLD) {
+          syncOpsCounter = 0;
+          await yieldEventLoop();
+        }
+
         passed = caseSensitive
           ? !output.includes(String(criteria))
           : !output.toLowerCase().includes(String(criteria).toLowerCase());
@@ -110,7 +136,19 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.REGEX: {
-        const pattern = new RegExp(String(criteria));
+        syncOpsCounter++;
+        if (syncOpsCounter >= SYNC_OPS_THRESHOLD) {
+          syncOpsCounter = 0;
+          await yieldEventLoop();
+        }
+
+        const str = String(criteria);
+        let pattern = regexCache.get(str);
+
+        if (!pattern) {
+          pattern = new RegExp(str);
+          regexCache.set(str, pattern);
+        }
 
         passed = pattern.test(output);
         score = passed ? 1 : 0;
@@ -121,6 +159,7 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.BEVAL: {
+        syncOpsCounter = 0;
         ({ score, reason } = await limit(() => bEval(
           answerOnly ? output : { query: prompt, answer: output },
           criteria,
@@ -142,6 +181,7 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.GEVAL: {
+        syncOpsCounter = 0;
         ({ score, reason } = await limit(() => gEval(
           answerOnly ? output : { query: prompt, answer: output },
           criteria,
@@ -163,6 +203,7 @@ const getAssertResult = async (
         break;
       }
       case ASSERT_NAMES.LLM_RUBRIC: {
+        syncOpsCounter = 0;
         const result = await limit(() => llmRubric(
           output,
           criteria,
