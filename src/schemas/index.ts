@@ -31,7 +31,9 @@ export const AssertSchema = Type.Object({
   // llm-as-judge fields
   provider: Type.Optional(Type.String()),
   model: Type.Optional(Type.String()),
-  temperature: Type.Optional(Type.Number({ default: 0.0 })),
+  options: Type.Optional(Type.Object({
+    temperature: Type.Optional(Type.Number({ default: 0.0 })),
+  })),
   must_fail: Type.Optional(Type.Boolean({ default: false })),
   // G-Eval/B-Eval fields
   answer_only: Type.Optional(Type.Boolean({ default: false })),
@@ -45,6 +47,9 @@ export const TestSchema = Type.Object({
   test_id: Type.Optional(Type.String({ format: 'uuid' })),
   provider: Type.String(),
   model: Type.String(),
+  options: Type.Optional(Type.Object({
+    temperature: Type.Optional(Type.Number()),
+  })),
   prompt: Type.String(),
   asserts: Type.Array(AssertSchema),
 });
@@ -76,6 +81,7 @@ export interface ITestResult {
   prompt: string;
   output: string;
   passed: boolean;
+  metadata?: Record<string, any>;
   started_at: Date;
   assert_started_at: Date;
   finished_at: Date;
