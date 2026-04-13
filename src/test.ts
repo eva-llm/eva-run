@@ -14,6 +14,7 @@ import {
   type IAssertResult,
   type TestSchemaT,
   type AssertSchemaT,
+  type ITestResult,
 } from './schemas';
 import { saveTestResult } from './db';
 import { yieldEventLoop, xnor } from './utils';
@@ -42,7 +43,7 @@ const getAssertResult = async (
     name,
     criteria,
     threshold = 0.5,
-    temperature = 0.0, // NOTE: Recommended for judging
+    options = { temperature: 0.0 }, // NOTE: Recommended for judging
     case_sensitive: caseSensitive = true,
     answer_only: answerOnly = false,
   } = assert;
@@ -165,13 +166,13 @@ const getAssertResult = async (
           criteria,
           assert.provider!,
           assert.model!,
-          { temperature },
+          options,
         )));
         passed = score > threshold;
         metadata = {
           provider: assert.provider!,
           model: assert.model!,
-          temperature,
+          ...options,
         };
 
         if (assert.must_fail !== undefined) {
@@ -187,13 +188,13 @@ const getAssertResult = async (
           criteria,
           assert.provider!,
           assert.model!,
-          { temperature },
+          options,
         )));
         passed = score > threshold;
         metadata = {
           provider: assert.provider!,
           model: assert.model!,
-          temperature,
+          ...options,
         };
 
         if (assert.must_fail !== undefined) {
@@ -209,7 +210,7 @@ const getAssertResult = async (
           criteria,
           assert.provider!,
           assert.model!,
-          { temperature },
+          options,
         ));
 
         ({ score, reason } = result);
@@ -217,7 +218,7 @@ const getAssertResult = async (
         metadata = {
           provider: assert.provider!,
           model: assert.model!,
-          temperature,
+          ...options,
         };
 
         if (assert.must_fail !== undefined) {
@@ -271,11 +272,13 @@ const getAssertResult = async (
  */
 export default async function (testConfig: TestSchemaT): Promise<void> {
   const testStartedAt = new Date();
-  const { prompt, provider, model } = testConfig;
+  const { prompt, provider, model, options = {} } = testConfig;
+
   const { output } = await limit(() => generateText({
     model: getModel(provider, model),
     system: `Request #${getHashId()}`,
     prompt,
+    ...options,
   }));
 
   const assertStartedAt = new Date();
@@ -283,7 +286,7 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     testConfig.asserts.map(assert => getAssertResult(prompt, output, assert))
   );
 
-  const results = settledResults.map((settled, idx) => {
+  const assertResults = settledResults.map((settled, idx) => {
     if (settled.status === 'fulfilled') {
       return settled.value;
     }
@@ -301,9 +304,9 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   });
 
   const testFinishedAt = new Date();
-  const isPassed = results.every(r => xnor(r.passed, !r.metadata?.must_fail));
+  const isPassed = assertResults.every(r => xnor(r.passed, !r.metadata?.must_fail));
 
-  saveTestResult({ // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
+  const testResult: ITestResult = {
     id: testConfig.test_id!,
     run_id: testConfig.run_id,
     provider,
@@ -317,5 +320,13 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     diff_ms: testFinishedAt.getTime() - testStartedAt.getTime(),
     assert_diff_ms: testFinishedAt.getTime() - assertStartedAt.getTime(),
     output_diff_ms: assertStartedAt.getTime() - testStartedAt.getTime(),
-  }, results);
+  }
+
+  if (options.temperature !== undefined) {
+    testResult.metadata = {
+      temperature: options.temperature,
+    };
+  }
+
+  saveTestResult(testResult, assertResults); // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
 }

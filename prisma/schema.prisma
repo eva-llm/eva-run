@@ -33,6 +33,7 @@ model TestResult {
   prompt           String
   output           String
   passed           Boolean
+  metadata         Json?
   started_at       DateTime
   assert_started_at DateTime
   finished_at      DateTime
