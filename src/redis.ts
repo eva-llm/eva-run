@@ -15,6 +15,15 @@ export const getRedis = () => new Redis(process.env.REDIS_URL!, {
 export function saveTestResultRedis(
   redis: Redis,
 ): TSaveTestResult {
+  // NOTE: Should be called once only
+  const gracefulShutdown = async () => {
+    await redis.quit(); // NOTE : quit() is better than disconnect() for graceful shutdown, it ensures all pending commands are processed before closing the connection.
+    process.exit(0);
+  };
+
+  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', gracefulShutdown);
+
   return async function (
     testResult: ITestResult,
     assertResults: IAssertResult[]

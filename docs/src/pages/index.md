@@ -335,7 +335,7 @@ Once we confirm the model's worldview is stable (Phase A), we apply high-level a
 
 ### Business Value & Throughput
 
-1.  **90% Token Budget Savings:** We eliminate unstable models using low-cost binary/MCQ tests. Expensive GPT-4/O1 calls are reserved for the final 10% of high-level validation.
+1.  **90% Token Budget Savings:** We eliminate unstable models using low-cost binary/MCQ tests. Expensive GPT-4.1/5.4 calls are reserved for the final 10% of high-level validation.
 2.  **Protection Against "Judge Paranoia":** We confirm the "correctness" of a trajectory already established in Phase A, neutralizing the judge's contextual blindness.
 3.  **Objective KPI Metrics:** We provide the client with two clear indices:
     * **CI (Consistency Index):** "How predictable is this model?"
