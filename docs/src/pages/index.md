@@ -6,6 +6,8 @@ A high-performance, stateless **"Fire & Forget"** I/O-bound server designed to p
 
 [**AI Metrology**](#ai-metrology)
 
+[**Statistical SLA**](#statistical-sla)
+
 ---
 
 ### Where is it in AI Testing Pyramid?
@@ -343,3 +345,172 @@ Once we confirm the model's worldview is stable (Phase A), we apply high-level a
 
 ## The "Killer Case" Summary
 We first verify the **Architectural Integrity** of the model's worldview via thousands of low-cost iterations, then precisely confirm its compliance with the regulatory standards. This approach is **100x faster** and **10x more accurate** than standard G-Eval / B-Eval implementations in the age of biased LLM-as-a-Judge.
+
+---
+
+## Statistical SLA
+AI systems, especially those based on modern machine learning, are inherently non-deterministic. Testing them exhaustively seems to require billions of test cases, across languages, contexts, and edge conditions.
+
+But this is not a new problem.
+
+We have already solved a very similar challenge in software QA. The difference is not in the nature of the problem - but in its scale and regulatory importance.
+
+---
+
+## The Illusion of Infinite Testing
+
+A naive approach to AI validation leads to a familiar conclusion:
+
+> "If the system is complex and probabilistic, we need to test everything."
+
+This quickly escalates into the idea of running billions of tests.
+
+However, this mirrors an early misunderstanding in QA processes. If we attempted to brute-force test all possible inputs of even a simple function, testing would be impossible. Yet modern software development works - not because we test everything, but because we test **strategically**.
+
+The same principle must be applied to AI.
+
+---
+
+## From Deterministic QA to Probabilistic Systems
+
+Traditional QA deals with deterministic systems where the expected output is known. AI systems, by contrast, produce outputs that are:
+
+- probabilistic
+- context-dependent
+- sensitive to distribution shifts
+
+Despite this, the **structure** of testing can remain surprisingly similar.
+
+Instead of verifying exact outputs, we evaluate:
+
+- correctness within a tolerance
+- adherence to constraints
+- statistical reliability
+
+This leads naturally to the concept of a **Statistical SLA**.
+
+---
+
+## Statistical SLA: A Practical Framework
+
+Rather than asking, "Is the system always correct?", we ask:
+
+> "Is the system correct often enough, in the contexts that matter?"
+
+A Statistical SLA defines:
+
+- acceptable error rates
+- confidence intervals
+- performance across predefined scenarios
+
+This aligns much better with the nature of AI systems and provides a measurable path toward **compliance**.
+
+---
+
+## Reusing QA Principles for AI Testing
+
+The key insight is that classical QA techniques still apply - with adaptation.
+
+### 1. Test Segmentation
+
+We divide the problem space into meaningful dimensions:
+
+- languages
+- categories (e.g., legal, medical, general knowledge)
+- user intents
+- risk levels
+
+This reduces complexity and allows targeted evaluation.
+
+### 2. Test Coverage Strategy
+
+Instead of aiming for full coverage, we prioritize:
+
+- high-risk areas
+- frequently used scenarios
+- regulatory-sensitive domains
+
+Coverage becomes **risk-weighted**, not exhaustive.
+
+### 3. Edge Cases First
+
+As in traditional QA, boundary conditions provide the highest value:
+
+- ambiguous prompts
+- adversarial inputs
+- rare linguistic constructions
+
+These tests expose weaknesses faster than random sampling.
+
+---
+
+## The Testing Pyramid for AI
+
+The well-known testing pyramid can be adapted:
+
+- **Smoke tests:** Basic sanity checks. If the model fails here, further testing is unnecessary.
+- **Core scenario tests:** Typical use cases representing the majority of real-world interactions.
+- **Stress and edge testing:** Focused on known weak points and high-risk behaviors.
+
+This layered approach prevents resource waste and enables scalable validation.
+
+---
+
+## Adaptive Testing Through Feedback
+
+One of the most powerful ideas from QA is feedback-driven testing.
+
+We start with a small test base and evolve it:
+
+1. Run initial tests (including smoke tests)
+1. Identify weak areas
+1. Increase test density selectively
+1. Reduce effort in stable regions
+
+This creates a dynamic testing system where resources are allocated efficiently.
+
+---
+
+## Why This Works
+
+Even in traditional software systems, full determinism is often an illusion. Modern systems are:
+
+- distributed
+- stateful
+- partially observable
+
+Unexpected behavior emerges constantly - and yet we manage reliability through testing focused on **typical usage** and **critical paths**.
+
+AI systems are not fundamentally different in this respect - only more explicit about their uncertainty.
+
+---
+
+## Limitations and Realism
+
+This approach does not guarantee:
+
+- perfect correctness
+- zero-risk deployment
+
+But it provides:
+
+- measurable reliability
+- transparent assumptions
+- auditable processes
+
+And most importantly, it aligns with how engineering has always handled complexity.
+
+---
+
+## Conclusion
+
+The AI Regulation does not introduce an entirely new challenge - it formalizes an existing one at a higher level of responsibility.
+
+The solution is not brute-force testing, but disciplined application of proven QA principles:
+
+- segmentation
+- prioritization
+- statistical evaluation
+- adaptive feedback loops
+
+In this sense, AI regulation is not a departure from engineering practice - it is its natural evolution.
