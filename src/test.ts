@@ -303,7 +303,7 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   const testFinishedAt = new Date();
   const isPassed = results.every(r => xnor(r.passed, !r.metadata?.must_fail));
 
-  await saveTestResult({
+  saveTestResult({ // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
     id: testConfig.test_id!,
     run_id: testConfig.run_id,
     provider,

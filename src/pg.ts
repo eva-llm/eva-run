@@ -18,6 +18,15 @@ export const getPrisma = () => {
 export function saveTestResultPg(
   prisma: PrismaClient,
 ): TSaveTestResult {
+  // NOTE: Should be called once only
+  const gracefulShutdown = async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  };
+
+  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', gracefulShutdown);
+
   return async function (
     testResult: ITestResult,
     assertResults: IAssertResult[]
