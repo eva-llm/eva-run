@@ -149,29 +149,43 @@ The server accepts an **array of test configurations**, validates the payload, t
     "properties": {
       "run_id": { "type": "string", "format": "uuid", "description": "Global ID for the entire test suite run" },
       "test_id": { "type": "string", "format": "uuid", "description": "Optional. If not provided, eva-run generates a UUIDv7" },
-      "provider": { "type": "string" },
-      "model": { "type": "string" },
-      "prompt": { "type": "string" },
+      "provider": { "type": "string", "description": "Default provider for the test (e.g., openai, anthropic)" },
+      "model": { "type": "string", "description": "Default model name (e.g., gpt-4o)" },
+      "options": { 
+        "type": "object", 
+        "description": "Forwarded Vercel AI SDK options (temperature, top_k, etc.)",
+        "additionalProperties": true 
+      },
+      "prompt": { "type": "string", "description": "The input text to be evaluated" },
       "asserts": {
         "type": "array",
         "items": {
           "type": "object",
           "properties": {
-            "name": { "enum": ["b-eval", "g-eval", "llm-rubric", "equals", "not-equals", "contains", "not-contains", "regex"] },
-            "criteria": { "type": "string" },
-            "threshold": { "type": "number", "default": 0.5 },
-            "provider": { "type": "string" },
-            "model": { "type": "string" },
-            "temperature": { "type": "number", "default": 0 },
+            "name": { 
+              "enum": ["b-eval", "g-eval", "llm-rubric", "equals", "not-equals", "contains", "not-contains", "regex"],
+              "description": "Assertion type"
+            },
+            "criteria": { "type": "string", "description": "Evaluation criteria or expected text" },
+            "threshold": { "type": "number", "default": 0.5, "description": "Minimum score for G-Eval/B-Eval" },
+            "provider": { "type": "string", "description": "Override provider for LLM-as-a-Judge" },
+            "model": { "type": "string", "description": "Override model for LLM-as-a-Judge" },
+            "options": { 
+              "type": "object", 
+              "description": "Forwarded Vercel AI SDK options (temperature, top_k, etc.)",
+              "additionalProperties": true 
+            },
             "must_fail": { "type": "boolean", "default": false },
-            "answer_only": { "type": "boolean", "default": false },
-            "case_sensitive": { "type": "boolean", "default": true }
+            "answer_only": { "type": "boolean", "default": false, "description": "If true, judge sees only the model output without the prompt" },
+            "case_sensitive": { "type": "boolean", "default": true, "description": "For text compare asserts" }
           },
-          "required": ["name", "criteria"]
+          "required": ["name", "criteria"],
+          "additionalProperties": false
         }
       }
     },
-    "required": ["run_id", "provider", "model", "prompt", "asserts"]
+    "required": ["run_id", "provider", "model", "prompt", "asserts"],
+    "additionalProperties": false
   }
 }
 ```
