@@ -21,8 +21,8 @@ const ASSERT_TABLE = 'assert_results';
 
 async function flushLoop(alwaysRun = 1) {
   let rawData: string[] | null = null;
-  let tests: ITestResult[];
-  let asserts: IAssertResult[];
+  let chTests: ITestResult[];
+  let chAsserts: IAssertResult[];
 
   do {
     try {
@@ -34,14 +34,14 @@ async function flushLoop(alwaysRun = 1) {
         continue;
       }
 
-      tests = [];
-      asserts = [];
+      chTests = [];
+      chAsserts = [];
 
       rawData.forEach((item) => {
         const { asserts, ...test } = JSON.parse(item);
 
-        tests.push(test);
-        asserts.push(...asserts);
+        chTests.push(test);
+        chAsserts.push(...asserts);
       });
     } catch (err) {
       await sleep(FLUSH_INTERVAL);
@@ -52,13 +52,13 @@ async function flushLoop(alwaysRun = 1) {
     try {
       await clickHouse.insert({
         table: ASSERT_TABLE,
-        values: asserts,
+        values: chAsserts,
         format: 'JSONEachRow',
       });
       // NOTE: Commit tests are finished as asserts are inserted
       await clickHouse.insert({
         table: TEST_TABLE,
-        values: tests,
+        values: chTests,
         format: 'JSONEachRow',
       });
 
