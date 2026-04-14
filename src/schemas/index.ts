@@ -32,9 +32,9 @@ export const AssertSchema = Type.Object({
   provider: Type.Optional(Type.String()),
   model: Type.Optional(Type.String()),
   options: Type.Optional(Type.Record(Type.String(), Type.Any())),
-  must_fail: Type.Optional(Type.Boolean({ default: false })),
+  must_fail: Type.Optional(Type.Boolean()),
   // G-Eval/B-Eval fields
-  answer_only: Type.Optional(Type.Boolean({ default: false })),
+  answer_only: Type.Optional(Type.Boolean()),
   // text compare fields
   case_sensitive: Type.Optional(Type.Boolean({ default: true })),
 });
