@@ -51,7 +51,7 @@
     "@ai-sdk/perplexity": "^3.0.26",
     "@ai-sdk/xai": "^3.0.73",
     "@clickhouse/client": "^1.18.2",
-    "@eva-llm/eva-judge": "^1.0.4",
+    "@eva-llm/eva-judge": "^1.0.5",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "@sinclair/typebox": "^0.34.48",

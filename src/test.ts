@@ -43,10 +43,14 @@ const getAssertResult = async (
     name,
     criteria,
     threshold = 0.5,
-    options = { temperature: 0.0 }, // NOTE: Recommended for judging
+    options = {},
     case_sensitive: caseSensitive = true,
     answer_only: answerOnly = false,
   } = assert;
+
+  if (options.temperature === undefined) {
+    options.temperature = 0.0; // NOTE: Recommended for judging
+  }
 
   try {  
     let score: number;

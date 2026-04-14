@@ -31,9 +31,7 @@ export const AssertSchema = Type.Object({
   // llm-as-judge fields
   provider: Type.Optional(Type.String()),
   model: Type.Optional(Type.String()),
-  options: Type.Optional(Type.Object({
-    temperature: Type.Optional(Type.Number({ default: 0.0 })),
-  })),
+  options: Type.Optional(Type.Record(Type.String(), Type.Any())),
   must_fail: Type.Optional(Type.Boolean({ default: false })),
   // G-Eval/B-Eval fields
   answer_only: Type.Optional(Type.Boolean({ default: false })),
@@ -47,9 +45,7 @@ export const TestSchema = Type.Object({
   test_id: Type.Optional(Type.String({ format: 'uuid' })),
   provider: Type.String(),
   model: Type.String(),
-  options: Type.Optional(Type.Object({
-    temperature: Type.Optional(Type.Number()),
-  })),
+  options: Type.Optional(Type.Record(Type.String(), Type.Any())),
   prompt: Type.String(),
   asserts: Type.Array(AssertSchema),
 });
