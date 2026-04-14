@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS test_results (
     prompt String,
     output String,
     passed UInt8,
+    metadata String,
     started_at DateTime64(3),
     assert_started_at DateTime64(3),
     finished_at DateTime64(3),
