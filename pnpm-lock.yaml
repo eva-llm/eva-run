@@ -42,8 +42,8 @@ importers:
         specifier: ^1.18.2
         version: 1.18.2
       '@eva-llm/eva-judge':
-        specifier: ^1.0.5
-        version: 1.0.5
+        specifier: ^1.0.6
+        version: 1.0.6
       '@prisma/adapter-pg':
         specifier: ^7.5.0
         version: 7.5.0
@@ -219,8 +219,8 @@ packages:
   '@electric-sql/pglite@0.3.15':
     resolution: {integrity: sha512-Cj++n1Mekf9ETfdc16TlDi+cDDQF0W7EcbyRHYOAeZdsAe8M/FJg18itDTSwyHfar2WIezawM9o0EKaRGVKygQ==}
 
-  '@eva-llm/eva-judge@1.0.5':
-    resolution: {integrity: sha512-zBUZEf61m2KtW58sLTnJ3gm20HDnyuFHMelS5cuh7y3cyp4cCjcB7L9IVJKrWR+/BHvKCOcGU2t2bH7MCS1iWA==}
+  '@eva-llm/eva-judge@1.0.6':
+    resolution: {integrity: sha512-5/nupUqM3gK8zKw8rcodHWudTMowT5Tj5TAz6Mp81BA5n32a4yhuzvqrbE/DCyXyQcguT/EBKZ08do9XXvOLPA==}
     engines: {node: '>=22'}
 
   '@fastify/ajv-compiler@4.0.5':
@@ -1136,7 +1136,7 @@ snapshots:
 
   '@electric-sql/pglite@0.3.15': {}
 
-  '@eva-llm/eva-judge@1.0.5':
+  '@eva-llm/eva-judge@1.0.6':
     dependencies:
       '@ai-sdk/amazon-bedrock': 4.0.82(zod@4.3.6)
       '@ai-sdk/anthropic': 3.0.63(zod@4.3.6)
