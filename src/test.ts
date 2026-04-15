@@ -279,10 +279,12 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
   const { prompt, provider, model, options = {} } = testConfig;
 
   const { output } = await limit(() => generateText({
+    ...options, // NOTE: Forward Vercel ai-sdk options can include temperature, max_tokens, etc.
+    messages: undefined, // NOTE: for role-based scenarios `llm-as-a-jest` plugin should be used.
+    tools: undefined, // NOTE: for tool-using scenarios `llm-as-a-jest` plugin should be used.
     model: getModel(provider, model),
     system: `Request #${getHashId()}`,
     prompt,
-    ...options,
   }));
 
   const assertStartedAt = new Date();
