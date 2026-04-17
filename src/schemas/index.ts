@@ -16,7 +16,7 @@ export const AssertNameEnum = Type.Union(
   Object.values(ASSERT_NAMES).map((val) => Type.Literal(val))
 );
 
-export type AssertName = (typeof ASSERT_NAMES)[keyof typeof ASSERT_NAMES];
+export type TAssertName = (typeof ASSERT_NAMES)[keyof typeof ASSERT_NAMES];
 
 /**
  * Unified Assert Schema.
@@ -38,7 +38,7 @@ export const AssertSchema = Type.Object({
   // text compare fields
   case_sensitive: Type.Optional(Type.Boolean({ default: true })),
 });
-export type AssertSchemaT = Static<typeof AssertSchema>;
+export type TAssertSchema = Static<typeof AssertSchema>;
 
 export const TestSchema = Type.Object({
   run_id: Type.String({ format: 'uuid' }),
@@ -49,12 +49,12 @@ export const TestSchema = Type.Object({
   prompt: Type.String(),
   asserts: Type.Array(AssertSchema),
 });
-export type TestSchemaT = Static<typeof TestSchema>;
+export type TTestSchema = Static<typeof TestSchema>;
 
 export const EvalResponse = Type.Object({
   test_ids: Type.Array(Type.String({ format: 'uuid' })),
 });
-export type EvalResponseT = Static<typeof EvalResponse>;
+export type TEvalResponse = Static<typeof EvalResponse>;
 
 export interface IAssertResult {
   name: string;

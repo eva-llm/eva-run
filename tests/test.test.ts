@@ -24,7 +24,7 @@ jest.mock('lru-cache', () => ({
 
 import { generateText } from 'ai';
 import { llmRubric, gEval, bEval } from '@eva-llm/eva-judge';
-import { ASSERT_NAMES, type TestSchemaT, type AssertSchemaT } from '../src/schemas';
+import { ASSERT_NAMES, type TTestSchema, type TAssertSchema } from '../src/schemas';
 import { saveTestResult } from '../src/db';
 import { getModel } from '../src/registry';
 import runTest from '../src/test';
@@ -54,7 +54,7 @@ const mockLlmRubric = llmRubric as jest.MockedFunction<typeof llmRubric>;
 const mockGEval = gEval as jest.MockedFunction<typeof gEval>;
 const mockBEval = bEval as jest.MockedFunction<typeof bEval>;
 
-function makeTestConfig(overrides: Partial<TestSchemaT> = {}): TestSchemaT {
+function makeTestConfig(overrides: Partial<TTestSchema> = {}): TTestSchema {
   return {
     run_id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     test_id: '11111111-2222-3333-4444-555555555555',
@@ -66,12 +66,12 @@ function makeTestConfig(overrides: Partial<TestSchemaT> = {}): TestSchemaT {
   };
 }
 
-function makeAssert(overrides: Partial<AssertSchemaT> = {}): AssertSchemaT {
+function makeAssert(overrides: Partial<TAssertSchema> = {}): TAssertSchema {
   return {
     name: ASSERT_NAMES.EQUALS,
     criteria: '4',
     ...overrides,
-  } as AssertSchemaT;
+  } as TAssertSchema;
 }
 
 describe('test module', () => {
