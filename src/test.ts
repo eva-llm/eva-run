@@ -12,9 +12,9 @@ import { getModel } from './registry';
 import {
   ASSERT_NAMES,
   type IAssertResult,
-  type TestSchemaT,
-  type AssertSchemaT,
+  type TAssertSchema,
   type ITestResult,
+  type TTestSchema,
 } from './schemas';
 import { saveTestResult } from './db';
 import { yieldEventLoop, xnor } from './utils';
@@ -30,13 +30,13 @@ const getHashId = () => crypto.randomBytes(16).toString('hex'); // NOTE: 16 byte
  * Runs the assert for a given assert configuration and returns the result.
  * @param {string} prompt - The prompt string.
  * @param {string} output - The output string.
- * @param {AssertSchemaT} assert - The assert configuration.
+ * @param {TAssertSchema} assert - The assert configuration.
  * @returns {Promise<IAssertResult>} The result of the assert.
  */
 const getAssertResult = async (
   prompt: string,
   output: string,
-  assert: AssertSchemaT,
+  assert: TAssertSchema,
 ): Promise<IAssertResult> => {
   const assertStartedAt = new Date();
   const { 
@@ -271,10 +271,10 @@ const getAssertResult = async (
 
 /**
  * Runs a test using the provided configuration, generates output, evaluates asserts, and saves results.
- * @param {TestSchemaT} testConfig - The test configuration.
+ * @param {TTestSchema} testConfig - The test configuration.
  * @returns {Promise<void>} Resolves when the test and all asserts are processed and saved.
  */
-export default async function (testConfig: TestSchemaT): Promise<void> {
+export default async function (testConfig: TTestSchema): Promise<void> {
   const testStartedAt = new Date();
   const { prompt, provider, model, options = {} } = testConfig;
 
@@ -328,10 +328,8 @@ export default async function (testConfig: TestSchemaT): Promise<void> {
     output_diff_ms: assertStartedAt.getTime() - testStartedAt.getTime(),
   }
 
-  if (options.temperature !== undefined) {
-    testResult.metadata = {
-      temperature: options.temperature,
-    };
+  if (Object.keys(options).length) { // NOTE: A bit quicker isEmpty = o => { for (const _ in o) return false; return true; }
+    testResult.metadata = options;
   }
 
   saveTestResult(testResult, assertResults); // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.

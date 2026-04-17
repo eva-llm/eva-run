@@ -6,8 +6,8 @@ import { uuidv7 } from 'uuidv7';
 import {
   TestSchema,
   EvalResponse,
-  type TestSchemaT,
-  type EvalResponseT,
+  type TTestSchema,
+  type TEvalResponse,
 } from '../schemas';
 
 import runTest from '../test';
@@ -15,12 +15,12 @@ import runTest from '../test';
 
 /**
  * Handles evaluation requests by running a test and returning the test ID.
- * @param {FastifyRequest<{ Body: TestSchemaT[] }>} request - The Fastify request object.
- * @returns {Promise<EvalResponseT>} The response containing the test ID.
+ * @param {FastifyRequest<{ Body: TTestSchema[] }>} request - The Fastify request object.
+ * @returns {Promise<TEvalResponse>} The response containing the test ID.
  */
 async function evalHandler(
-  request: FastifyRequest<{ Body: TestSchemaT[] }>,
-): Promise<EvalResponseT> {
+  request: FastifyRequest<{ Body: TTestSchema[] }>,
+): Promise<TEvalResponse> {
   const testConfigs = request.body;
   const testIds: string[] = [];
 
