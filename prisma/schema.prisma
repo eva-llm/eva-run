@@ -28,8 +28,8 @@ model AssertResult {
 model TestResult {
   id               String   @id
   run_id           String
-  provider         String
-  model            String
+  provider         String?
+  model            String?
   prompt           String
   output           String
   passed           Boolean

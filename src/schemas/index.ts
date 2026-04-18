@@ -40,15 +40,30 @@ export const AssertSchema = Type.Object({
 });
 export type TAssertSchema = Static<typeof AssertSchema>;
 
-export const TestSchema = Type.Object({
+const BaseTest = Type.Object({
   run_id: Type.String({ format: 'uuid' }),
   test_id: Type.Optional(Type.String({ format: 'uuid' })),
-  provider: Type.String(),
-  model: Type.String(),
-  options: Type.Optional(Type.Record(Type.String(), Type.Any())),
   prompt: Type.String(),
   asserts: Type.Array(AssertSchema),
 });
+
+const LiveTest = Type.Intersect([
+  BaseTest,
+  Type.Object({
+    provider: Type.String(),
+    model: Type.String(),
+    options: Type.Optional(Type.Record(Type.String(), Type.Any())),
+  }),
+]);
+
+const AuditTest = Type.Intersect([
+  BaseTest,
+  Type.Object({
+    output: Type.String(),
+  }),
+]);
+
+export const TestSchema = Type.Union([LiveTest, AuditTest]);
 export type TTestSchema = Static<typeof TestSchema>;
 
 export const EvalResponse = Type.Object({
@@ -72,8 +87,8 @@ export interface IAssertResult {
 export interface ITestResult {
   id: string;
   run_id: string;
-  provider: string;
-  model: string;
+  provider?: string;
+  model?: string;
   prompt: string;
   output: string;
   passed: boolean;
