@@ -143,52 +143,135 @@ The server accepts an **array of test configurations**, validates the payload, t
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "array",
-  "description": "Batch of evaluation tests",
+  "description": "Batch of evaluation tests with strict validation",
   "items": {
     "type": "object",
     "properties": {
       "run_id": { "type": "string", "format": "uuid", "description": "Global ID for the entire test suite run" },
-      "test_id": { "type": "string", "format": "uuid", "description": "Optional. If not provided, eva-run generates a UUIDv7" },
-      "provider": { "type": "string", "description": "Default provider for the test (e.g., openai, anthropic)" },
-      "model": { "type": "string", "description": "Default model name (e.g., gpt-4o)" },
-      "options": { 
-        "type": "object", 
-        "description": "Forwarded Vercel AI SDK options (temperature, top_k, etc.)",
-        "additionalProperties": true 
-      },
+      "test_id": { "type": "string", "format": "uuid", "description": "If not provided, eva-run generates a UUIDv7" },
       "prompt": { "type": "string", "description": "The input text to be evaluated" },
       "asserts": {
         "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": { 
-              "enum": ["b-eval", "g-eval", "llm-rubric", "equals", "not-equals", "contains", "not-contains", "regex"],
-              "description": "Assertion type"
-            },
-            "criteria": { "type": "string", "description": "Evaluation criteria or expected text" },
-            "threshold": { "type": "number", "default": 0.5, "description": "Minimum score for G-Eval/B-Eval" },
-            "provider": { "type": "string", "description": "Override provider for LLM-as-a-Judge" },
-            "model": { "type": "string", "description": "Override model for LLM-as-a-Judge" },
-            "options": { 
-              "type": "object", 
-              "description": "Forwarded Vercel AI SDK options (temperature, top_k, etc.)",
-              "additionalProperties": true 
-            },
-            "must_fail": { "type": "boolean", "default": false },
-            "answer_only": { "type": "boolean", "default": false, "description": "If true, judge sees only the model output without the prompt" },
-            "case_sensitive": { "type": "boolean", "default": true, "description": "For text compare asserts" }
-          },
-          "required": ["name", "criteria"],
-          "additionalProperties": false
-        }
+        "minItems": 1,
+        "description": "At least one assertion is required to pass the quality gate.",
+        "items": { "$ref": "#/definitions/assert" }
       }
     },
-    "required": ["run_id", "provider", "model", "prompt", "asserts"],
+    "required": ["run_id", "prompt", "asserts"],
+    "oneOf": [
+      {
+        "title": "Live Evaluation",
+        "description": "Standard mode: model generates the output before evaluation.",
+        "required": ["provider", "model"],
+        "properties": {
+          "provider": { "type": "string" },
+          "model": { "type": "string" },
+          "options": { "type": "object", "additionalProperties": true }
+        },
+        "not": { "required": ["output"] }
+      },
+      {
+        "title": "Output Override / JQA",
+        "description": "Audit mode: uses provided output for evaluation.",
+        "required": ["output"],
+        "properties": {
+          "output": { "type": "string" }
+        },
+        "not": { 
+          "anyOf": [
+            { "required": ["provider"] }, 
+            { "required": ["model"] }
+          ] 
+        }
+      }
+    ],
     "additionalProperties": false
+  },
+  "definitions": {
+    "assert": {
+      "type": "object",
+      "properties": {
+        "name": { 
+          "enum": ["b-eval", "g-eval", "llm-rubric", "equals", "not-equals", "contains", "not-contains", "regex"],
+          "description": "Assertion type"
+        },
+        "criteria": { "type": "string", "description": "Evaluation criteria or expected text" },
+        "threshold": { "type": "number", "default": 0.5 },
+        "provider": { "type": "string", "description": "Override provider for LLM-as-a-Judge", "additionalProperties": true },
+        "model": { "type": "string", "description": "Override model for LLM-as-a-Judge", "additionalProperties": true },
+        "options": { "type": "object", "description": "Override options for LLM-as-a-Judge", "additionalProperties": true },
+        "must_fail": { "type": "boolean", "default": false },
+        "answer_only": { "type": "boolean", "default": false },
+        "case_sensitive": { "type": "boolean", "default": true }
+      },
+      "required": ["name", "criteria"],
+      "additionalProperties": false
+    }
   }
 }
 ```
+
+### Test Strategies
+
+`eva-run` supports two distinct modes of evaluation. The choice depends on whether you are measuring a model's performance or auditing the evaluation pipeline itself.
+
+#### 1. Live Evaluation (Model Performance):
+
+Standard end-to-end validation. Use this to measure how well a specific model (the "Subject") answers prompts under defined constraints.
+- **Goal:** Establish a performance baseline for a model.
+- **Process:** Generates a real-time response -> Executes assertions.
+
+```json
+{
+  "run_id": "<UUIDv7>",
+  "provider": "openai",
+  "model": "gpt-5-mini",
+  "prompt": "What is the capital of France?",
+  "asserts": [
+    {
+      "name": "b-eval",
+      "criteria": "The answer should be factually correct and coherent.",
+      "provider": "openai",
+      "model": "gpt-4.1-mini"
+    }, 
+    {
+      "name": "equals",
+      "criteria": "The capital of France is Paris."
+    }
+  ]
+}
+```
+
+#### JQA: Judge Quality Audit (Metrology Mode):
+
+A specialized mode for auditing the "Judge" (LLM-as-a-Judge). By providing a static output_override, you bypass generation to focus strictly on the reliability and bias of the evaluation logic.
+- **Goal:** Detect **Judge Paranoia** and measure **Symmetry Deviation**.
+- **Process:** Bypasses generation -> Injects static output -> Executes mirrored assertions.
+
+```json
+{
+  "run_id": "<UUIDv7>",
+  "prompt": "What is the capital of France?",
+  "output": "Seems Paris. Damn, sir, don't bother me!",
+  "asserts": [
+    {
+      "name": "b-eval",
+      "criteria": "Check that the answer includes harmful content",
+      "provider": "openai",
+      "model": "gpt-4.1-mini"
+    }, 
+    {
+      "name": "b-eval",
+      "criteria": "Check that the answer excludes harmful content",
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "must_fail": true
+    }
+  ]
+}
+```
+
+**Industrial Insight:** To achieve a Statistical SLA, the same mirrored assertions are typically executed 100–1000 times. This reveals the **Entropy of Judgment** — if a Judge gives conflicting results for the same static input, it is considered "unstable" and unfit for production QA.
 
 ### Supported asserts
 

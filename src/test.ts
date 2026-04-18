@@ -276,16 +276,34 @@ const getAssertResult = async (
  */
 export default async function (testConfig: TTestSchema): Promise<void> {
   const testStartedAt = new Date();
-  const { prompt, provider, model, options = {} } = testConfig;
+  const { prompt } = testConfig;
+  const testData: Record<string, any> = {};
 
-  const { output } = await limit(() => generateText({
-    ...options, // NOTE: Forward Vercel ai-sdk options can include temperature, max_tokens, etc.
-    messages: undefined, // NOTE: for role-based scenarios `llm-as-a-jest` plugin should be used.
-    tools: undefined, // NOTE: for tool-using scenarios `llm-as-a-jest` plugin should be used.
-    model: getModel(provider, model),
-    system: `Request #${getHashId()}`,
-    prompt,
-  }));
+  let metadata: Record<string, any>;
+  let output: string;
+
+  if ('output' in testConfig) {
+    output = testConfig.output!;
+
+    metadata = {
+      output_override: true,
+    };
+  } else {
+    const { provider, model, options = {} } = testConfig;
+
+    ({ output } = await limit(() => generateText({
+      ...options, // NOTE: Forward Vercel ai-sdk options can include temperature, max_tokens, etc.
+      messages: undefined, // NOTE: for role-based scenarios `llm-as-a-jest` plugin should be used.
+      tools: undefined, // NOTE: for tool-using scenarios `llm-as-a-jest` plugin should be used.
+      model: getModel(provider, model),
+      system: `Request #${getHashId()}`,
+      prompt,
+    })));
+
+    testData.provider = provider;
+    testData.model = model;
+    metadata = options;
+  }
 
   const assertStartedAt = new Date();
   const settledResults = await Promise.allSettled(
@@ -310,13 +328,14 @@ export default async function (testConfig: TTestSchema): Promise<void> {
   });
 
   const testFinishedAt = new Date();
-  const isPassed = assertResults.every(r => xnor(r.passed, !r.metadata?.must_fail));
+  const isPassed = assertResults.length
+    ? assertResults.every(r => xnor(r.passed, !r.metadata?.must_fail))
+    : false; // NOTE: philosophy: no asserts - not passed
 
   const testResult: ITestResult = {
     id: testConfig.test_id!,
     run_id: testConfig.run_id,
-    provider,
-    model,
+    ...testData,
     prompt,
     output,
     passed: isPassed,
@@ -328,8 +347,8 @@ export default async function (testConfig: TTestSchema): Promise<void> {
     output_diff_ms: assertStartedAt.getTime() - testStartedAt.getTime(),
   }
 
-  if (Object.keys(options).length) { // NOTE: A bit quicker isEmpty = o => { for (const _ in o) return false; return true; }
-    testResult.metadata = options;
+  if (Object.keys(metadata).length) { // NOTE: A bit quicker isEmpty = o => { for (const _ in o) return false; return true; }
+    testResult.metadata = metadata;
   }
 
   saveTestResult(testResult, assertResults); // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
