@@ -246,7 +246,7 @@ Standard end-to-end validation. Use this to measure how well a specific model (t
 
 #### JQA: Judge Quality Audit (Metrology Mode):
 
-A specialized mode for auditing the "Judge" (LLM-as-a-Judge). By providing a static output_override, you bypass generation to focus strictly on the reliability and bias of the evaluation logic.
+A specialized mode for auditing the "Judge" (LLM-as-a-Judge). By providing a static `output_override`, you bypass generation to focus strictly on the reliability and bias of the evaluation logic.
 - **Goal:** Detect **Judge Paranoia** and measure **Symmetry Deviation**.
 - **Process:** Bypasses generation -> Injects static output -> Executes mirrored assertions.
 
