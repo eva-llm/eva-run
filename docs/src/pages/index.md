@@ -273,6 +273,8 @@ A specialized mode for auditing the "Judge" (LLM-as-a-Judge). By providing a sta
 
 **Industrial Insight:** To achieve a Statistical SLA, the same mirrored assertions are typically executed 100–1000 times. This reveals the **Entropy of Judgment** — if a Judge gives conflicting results for the same static input, it is considered "unstable" and unfit for production QA.
 
+Working example with Promptfoo-like format is in `eva-cli` [repo](https://github.com/eva-llm/eva-cli/blob/main/examples/jqa_dark_teaming.yaml).
+
 ### Supported asserts
 
 We cover 90% of production AI evaluation needs, with a heavy focus on LLM-as-a-Judge matchers:
