@@ -27,7 +27,7 @@ export type TAssertName = (typeof ASSERT_NAMES)[keyof typeof ASSERT_NAMES];
 export const AssertSchema = Type.Object({
   name: AssertNameEnum,
   criteria: Type.String(),
-  threshold: Type.Optional(Type.Number({ default: 0.5 })),
+  threshold: Type.Optional(Type.Number()),
   // llm-as-judge fields
   provider: Type.Optional(Type.String()),
   model: Type.Optional(Type.String()),
@@ -36,7 +36,7 @@ export const AssertSchema = Type.Object({
   // G-Eval/B-Eval fields
   answer_only: Type.Optional(Type.Boolean()),
   // text compare fields
-  case_sensitive: Type.Optional(Type.Boolean({ default: true })),
+  case_sensitive: Type.Optional(Type.Boolean()),
 });
 export type TAssertSchema = Static<typeof AssertSchema>;
 
