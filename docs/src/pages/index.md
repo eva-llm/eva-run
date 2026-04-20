@@ -111,11 +111,32 @@ git clone https://github.com/eva-llm/eva-run
 cd eva-run
 nvm use
 pnpm i
+export OPENAI_API_KEY="..."
 export DATABASE_URL="postgresql://..."
 pnpx prisma db push
 pnpx prisma generate
 pnpm run server
+
+curl -X POST http://localhost:3000/eval \
+  -H "Content-Type: application/json" \
+  -d '[{
+    "run_id": "019d1fca-d42b-777c-b78b-a4e0af6efc96",
+    "provider": "openai",
+    "model": "gpt-5.4-mini",
+    "prompt": "What is the capital of France?",
+    "asserts": [
+      {
+        "name": "g-eval",
+        "provider": "openai",
+        "model": "gpt-4.1-mini",
+        "criteria": "answer should be factually correct and relevant to question"
+      }
+    ]
+  }]'
+{"test_ids":["019dabb3-2915-7d7e-940f-5d7937bec89c"]}
 ```
+
+Examples of tests with Promptfoo-format could be found in `eva-cli` [docs](https://eva-llm.github.io/eva-cli/#usage-examples).
 
 ---
 
