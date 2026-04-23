@@ -1,8 +1,11 @@
 import Redis from 'ioredis';
 import { createClient } from '@clickhouse/client';
 import { QUEUE_NAME } from './constants';
-import { IAssertResult, ITestResult } from 'schemas';
-import { sleep } from 'utils';
+import {
+  type IAssertResult,
+  type ITestResult,
+} from './schemas';
+import { sleep } from './utils';
 
 
 const redis = new Redis(process.env.REDIS_URL!, {
