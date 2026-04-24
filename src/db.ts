@@ -5,7 +5,7 @@ import { saveTestResultRedis, getRedis } from './redis';
 
 let saveTestResult: TSaveTestResult;
 
-if (process.env.REDIS_URL) {
+if (process.env.DATA_REDIS_URL) {
   saveTestResult = saveTestResultRedis(getRedis());
 } else {
   saveTestResult = saveTestResultPg(getPrisma());

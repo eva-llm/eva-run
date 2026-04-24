@@ -356,7 +356,7 @@ For high-volume production environments where performance is critical, `eva-run`
 
 ### ClickHouse & Redis Integration
 To enable high-throughput data persistence:
-1. Ensure the `REDIS_URL` and `CLICKHOUSE_URL` environment variables are provided.
+1. Ensure the `DATA_REDIS_URL` and `CLICKHOUSE_URL` environment variables are provided.
 1. Use the specialized runtime mode:
 
 ```Bash

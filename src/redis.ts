@@ -1,19 +1,17 @@
-import Redis from 'ioredis';
 import { uuidv7 } from 'uuidv7';
 import {
   type TSaveTestResult,
   type IAssertResult,
   type ITestResult,
 } from './schemas';
-import { QUEUE_NAME } from './constants';
+import { QUEUE_TEST_RESULT } from './constants';
+import { redis } from './utils';
 
 
-export const getRedis = () => new Redis(process.env.REDIS_URL!, {
-  retryStrategy: (times) => Math.min(times * 50, 2000),
-});
+export const getRedis = () => redis(process.env.DATA_REDIS_URL!);
 
 export function saveTestResultRedis(
-  redis: Redis,
+  redis: ReturnType<typeof getRedis>,
 ): TSaveTestResult {
   // NOTE: Should be called once only
   const gracefulShutdown = async () => {
@@ -39,6 +37,6 @@ export function saveTestResultRedis(
       }))
     };
 
-    await redis.lpush(QUEUE_NAME, JSON.stringify(envelope));
+    await redis.lpush(QUEUE_TEST_RESULT, JSON.stringify(envelope));
   }
 }

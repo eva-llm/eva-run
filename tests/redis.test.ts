@@ -1,5 +1,5 @@
 import { type ITestResult, type IAssertResult } from '../src/schemas';
-import { QUEUE_NAME } from '../src/constants';
+import { QUEUE_TEST_RESULT } from '../src/constants';
 
 const MockRedis = jest.fn().mockImplementation(() => ({
   lpush: jest.fn().mockResolvedValue(1),
@@ -23,7 +23,7 @@ describe('redis module', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env = { ...originalEnv, REDIS_URL: 'redis://localhost:6379' };
+    process.env = { ...originalEnv, DATA_REDIS_URL: 'redis://localhost:6379' };
   });
 
   afterEach(() => {
@@ -31,7 +31,7 @@ describe('redis module', () => {
   });
 
   describe('getRedis', () => {
-    it('should create a Redis instance with REDIS_URL', () => {
+    it('should create a Redis instance with DATA_REDIS_URL', () => {
       const redis = getRedis();
       expect(MockRedis).toHaveBeenCalledWith('redis://localhost:6379', {
         retryStrategy: expect.any(Function),
@@ -115,7 +115,7 @@ describe('redis module', () => {
 
       expect(mockRedis.lpush).toHaveBeenCalledTimes(1);
       expect(mockRedis.lpush).toHaveBeenCalledWith(
-        QUEUE_NAME,
+        QUEUE_TEST_RESULT,
         expect.any(String),
       );
 
