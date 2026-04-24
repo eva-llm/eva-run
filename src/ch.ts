@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import { createClient } from '@clickhouse/client';
-import { QUEUE_NAME } from './constants';
+import { QUEUE_TEST_RESULT } from './constants';
 import {
   type IAssertResult,
   type ITestResult,
@@ -8,7 +8,7 @@ import {
 import { sleep } from './utils';
 
 
-const redis = new Redis(process.env.REDIS_URL!, {
+const redis = new Redis(process.env.DATA_REDIS_URL!, {
   retryStrategy: (times) => Math.min(times * 50, 2000),
 });
 
@@ -29,7 +29,7 @@ async function flushLoop(alwaysRun = 1) {
 
   do {
     try {
-      rawData = await redis.rpop(QUEUE_NAME, BATCH_SIZE);
+      rawData = await redis.rpop(QUEUE_TEST_RESULT, BATCH_SIZE);
       
       if (!rawData?.length) {
         await sleep(SEC);
@@ -73,7 +73,7 @@ async function flushLoop(alwaysRun = 1) {
     } catch (err) {
       // NOTE: Use always `LIMIT 1 BY id` in SQL query to avoid assert duplicates
       if (rawData?.length) {
-        await redis.lpush(QUEUE_NAME, ...rawData);
+        await redis.lpush(QUEUE_TEST_RESULT, ...rawData);
       }
       await sleep(FLUSH_INTERVAL);
     }

@@ -25,8 +25,8 @@ describe('db module', () => {
     process.env = originalEnv;
   });
 
-  it('should use Redis when REDIS_URL is set', async () => {
-    process.env = { ...originalEnv, REDIS_URL: 'redis://localhost:6379' };
+  it('should use Redis when DATA_REDIS_URL is set', async () => {
+    process.env = { ...originalEnv, DATA_REDIS_URL: 'redis://localhost:6379' };
 
     const { saveTestResult } = await import('../src/db');
 
@@ -37,9 +37,9 @@ describe('db module', () => {
     expect(mockSaveTestResultPg).not.toHaveBeenCalled();
   });
 
-  it('should use Postgres when REDIS_URL is not set', async () => {
+  it('should use Postgres when DATA_REDIS_URL is not set', async () => {
     process.env = { ...originalEnv };
-    delete process.env.REDIS_URL;
+    delete process.env.DATA_REDIS_URL;
 
     const { saveTestResult } = await import('../src/db');
 

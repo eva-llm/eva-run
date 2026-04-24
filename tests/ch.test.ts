@@ -1,4 +1,4 @@
-import { QUEUE_NAME } from '../src/constants';
+import { QUEUE_TEST_RESULT } from '../src/constants';
 
 const mockRpop = jest.fn();
 const mockLpush = jest.fn();
@@ -52,7 +52,7 @@ describe('ch module', () => {
     mockRpop.mockImplementation(hang);
     process.env = {
       ...originalEnv,
-      REDIS_URL: 'redis://localhost:6379',
+      DATA_REDIS_URL: 'redis://localhost:6379',
       CLICKHOUSE_URL: 'http://localhost:8123',
     };
 
@@ -69,7 +69,7 @@ describe('ch module', () => {
   });
 
   describe('initialization', () => {
-    it('should create a Redis instance with REDIS_URL and retry strategy', () => {
+    it('should create a Redis instance with DATA_REDIS_URL and retry strategy', () => {
       jest.isolateModules(() => {
         require('../src/ch');
       });
@@ -126,7 +126,7 @@ describe('ch module', () => {
 
       await flushMicrotasks();
 
-      expect(mockRpop).toHaveBeenCalledWith(QUEUE_NAME, 5000);
+      expect(mockRpop).toHaveBeenCalledWith(QUEUE_TEST_RESULT, 5000);
       expect(mockSleep).toHaveBeenCalledWith(1000);
     });
 
@@ -199,7 +199,7 @@ describe('ch module', () => {
 
       await flushMicrotasks();
 
-      expect(mockLpush).toHaveBeenCalledWith(QUEUE_NAME, rawItem);
+      expect(mockLpush).toHaveBeenCalledWith(QUEUE_TEST_RESULT, rawItem);
       expect(mockSleep).toHaveBeenCalledWith(5000);
     });
 

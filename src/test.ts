@@ -18,6 +18,9 @@ import {
 } from './schemas';
 import { saveTestResult } from './db';
 import { yieldEventLoop, xnor } from './utils';
+import CONF from './config';
+import test from 'node:test';
+import { QUEUE_TEST_DONE } from './constants';
 
 
 let syncOpsCounter = 0;
@@ -351,5 +354,8 @@ export default async function (testConfig: TTestSchema): Promise<void> {
     testResult.metadata = metadata;
   }
 
-  saveTestResult(testResult, assertResults); // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
+  saveTestResult(testResult, assertResults) // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
+    .then(() => {
+      CONF.clusterRedis?.lpush(QUEUE_TEST_DONE, testResult.id);
+    });
 }
