@@ -1,12 +1,9 @@
-import os from 'node:os';
 import Fastify from 'fastify';
 
 import CONF from './config';
 import { registerEvalRoute } from './handlers/eval';
 import { QUEUE_NODE_PING } from './constants';
-
-
-const HOST = os.hostname();
+import { sleep } from './utils';
 
 /**
  * Main entry point for the Fastify server.
@@ -28,10 +25,11 @@ const fastify = Fastify({
 fastify.get('/health', async () => ({ status: 'ok' }));
 registerEvalRoute(fastify);
 
-const startClusterPing = () => {
-  setInterval(() => {
-    CONF.clusterRedis!.zadd(QUEUE_NODE_PING, Date.now(), `http://${HOST}:${CONF.port}`);
-  }, CONF.clusterPing);
+const startClusterPing = async () => {
+  while (true) {
+    await CONF.clusterRedis!.zadd(QUEUE_NODE_PING, Date.now(), `http://${CONF.host}:${CONF.port}`);
+    await sleep(CONF.clusterPing);
+  }
 };
 
 
