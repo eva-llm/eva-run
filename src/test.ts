@@ -277,7 +277,7 @@ const getAssertResult = async (
  * @param {TTestSchema} testConfig - The test configuration.
  * @returns {Promise<void>} Resolves when the test and all asserts are processed and saved.
  */
-export default async function (testConfig: TTestSchema): Promise<void> {
+export default async function testRun (testConfig: TTestSchema): Promise<void> {
   const testStartedAt = new Date();
   const { prompt } = testConfig;
   const testData: Record<string, any> = {};
@@ -354,8 +354,14 @@ export default async function (testConfig: TTestSchema): Promise<void> {
     testResult.metadata = metadata;
   }
 
-  saveTestResult(testResult, assertResults) // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
-    .then(() => {
-      CONF.clusterRedis?.lpush(QUEUE_TEST_DONE, testResult.id);
-    });
+  await saveTestResult(testResult, assertResults) // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
+  await CONF.clusterRedis?.lpush(QUEUE_TEST_DONE, testResult.id);
+  CONF.runningTestsAmount--;
+
+  const nextTest = CONF.testsQueue.shift();
+
+  if (nextTest) {
+    testRun(nextTest);
+    CONF.runningTestsAmount++;
+  }
 }

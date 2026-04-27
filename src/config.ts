@@ -1,13 +1,20 @@
+import os from 'node:os';
 import { LRUCache } from 'lru-cache';
 import { type LanguageModel } from 'ai';
 
 import { redis } from './utils';
+import { TTestSchema } from './schemas';
 
 /**
  * Configuration object for model caching and related utilities.
  */
 export default {
+  host: os.hostname(),
   port: Number(process.env.EVA_RUN_PORT || 3000),
+  url: `http://${os.hostname()}:${Number(process.env.EVA_RUN_PORT || 3000)}`,
+  testsQueue: [] as TTestSchema[],
+  runningTestsAmount: 0,
+  maxTestsAmount: Number(process.env.MAX_TESTS_AMOUNT || 1000),
   clusterPing: 10 * 1000, // 10 seconds
   clusterRedis: process.env.CLUSTER_REDIS_URL
     ? redis(process.env.CLUSTER_REDIS_URL)

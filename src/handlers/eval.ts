@@ -11,6 +11,7 @@ import {
 } from '../schemas';
 
 import runTest from '../test';
+import CONF from '../config';
 
 
 /**
@@ -29,7 +30,13 @@ async function evalHandler(
 
     testConfig.test_id = testId;
     testIds.push(testId);
-    runTest(testConfig); // NOTE: We don't await this, just return test_id[] to client for status tracking
+    if (CONF.runningTestsAmount >= CONF.maxTestsAmount) {
+      CONF.testsQueue.push(testConfig);
+      continue;
+    } else {
+      runTest(testConfig); // NOTE: We don't await this, just return test_id[] to client for status tracking
+      CONF.runningTestsAmount++;
+    }
   }
 
   return { test_ids: testIds };
