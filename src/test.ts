@@ -19,7 +19,7 @@ import {
 import { saveTestResult } from './db';
 import { yieldEventLoop, xnor } from './utils';
 import CONF from './config';
-import test from 'node:test';
+import cluster from './cluster';
 import { QUEUE_TEST_DONE } from './constants';
 
 
@@ -355,11 +355,11 @@ export default async function testRun (testConfig: TTestSchema): Promise<void> {
   }
 
   await saveTestResult(testResult, assertResults) // NOTE: await is useless, a) it adds minor performance overhead, b) we don't need to guarantee that the result is saved before proceeding, c) it can be done in background and doesn't affect the test result.
-  await CONF.clusterRedis?.lpush(QUEUE_TEST_DONE, testResult.id);
+  cluster?.notifyTestDone(testConfig.test_id!);
+
+  // NOTE: backpressure management
   CONF.runningTestsAmount--;
-
   const nextTest = CONF.testsQueue.shift();
-
   if (nextTest) {
     testRun(nextTest);
     CONF.runningTestsAmount++;
