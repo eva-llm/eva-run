@@ -1,6 +1,13 @@
 import CONF from '../src/config';
 import { getModel } from '../src/registry';
 
+jest.mock('node:os', () => ({
+  __esModule: true,
+  default: {
+      hostname: jest.fn(() => 'localhost'),
+  },
+}));
+
 jest.mock('@ai-sdk/openai', () => ({
   openai: jest.fn((model: string) => ({ provider: 'openai', modelId: model })),
 }));

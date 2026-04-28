@@ -7,6 +7,13 @@ jest.mock('node:crypto', () => ({
   },
 }));
 
+jest.mock('node:os', () => ({
+  __esModule: true,
+  default: {
+      hostname: jest.fn(() => 'localhost'),
+  },
+}));
+
 jest.mock('p-limit', () => ({
   __esModule: true,
   default: jest.fn(() => (fn: Function) => fn()),
