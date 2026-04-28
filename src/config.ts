@@ -2,7 +2,6 @@ import os from 'node:os';
 import { LRUCache } from 'lru-cache';
 import { type LanguageModel } from 'ai';
 
-import { redis } from './utils';
 import { TTestSchema } from './schemas';
 
 /**
@@ -15,10 +14,7 @@ export default {
   testsQueue: [] as TTestSchema[],
   runningTestsAmount: 0,
   maxTestsAmount: Number(process.env.MAX_TESTS_AMOUNT || 1000),
-  clusterPing: 10 * 1000, // 10 seconds
-  clusterRedis: process.env.CLUSTER_REDIS_URL
-    ? redis(process.env.CLUSTER_REDIS_URL)
-    : undefined,
+  clusterPingInterval: 10 * 1000, // 10 seconds
   /** Whether model caching is enabled. */
   isModelCached: true,
   /** LRU cache for LanguageModel instances. */

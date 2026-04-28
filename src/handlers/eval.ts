@@ -30,6 +30,7 @@ async function evalHandler(
 
     testConfig.test_id = testId;
     testIds.push(testId);
+    // NOTE: backpressure management
     if (CONF.runningTestsAmount >= CONF.maxTestsAmount) {
       CONF.testsQueue.push(testConfig);
       continue;

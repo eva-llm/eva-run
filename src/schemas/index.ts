@@ -108,3 +108,8 @@ export type TSaveTestResult = (
   testResult: ITestResult,
   assertResults: IAssertResult[],
 ) => Promise<void>;
+
+export interface ICluster {
+  startPinging: () => Promise<void>;
+  notifyTestDone: (testId: string) => Promise<number>;
+}
