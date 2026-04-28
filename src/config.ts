@@ -8,9 +8,18 @@ import { TTestSchema } from './schemas';
  * Configuration object for model caching and related utilities.
  */
 export default {
-  host: os.hostname(),
+  host: process.env.MY_POD_IP || os.hostname(),
   port: Number(process.env.EVA_RUN_PORT || 3000),
-  url: `http://${os.hostname()}:${Number(process.env.EVA_RUN_PORT || 3000)}`,
+  get url() {
+    const value = `http://${this.host}:${this.port}`;
+    Object.defineProperty(this, 'url', {
+      value,
+      writable: false,
+      configurable: true,
+      enumerable: true,
+    });
+    return value;
+  },
   testsQueue: [] as TTestSchema[],
   runningTestsAmount: 0,
   maxTestsAmount: Number(process.env.MAX_TESTS_AMOUNT || 1000),

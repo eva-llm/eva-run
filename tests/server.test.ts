@@ -4,11 +4,19 @@ const mockLog = {
 };
 
 const mockFastifyInstance = {
+  get: jest.fn(),
   listen: jest.fn(),
   log: mockLog,
 };
 
 const mockFastifyConstructor = jest.fn(() => mockFastifyInstance);
+
+jest.mock('node:os', () => ({
+  __esModule: true,
+  default: {
+      hostname: jest.fn(() => 'localhost'),
+  },
+}));
 
 jest.mock('fastify', () => ({
   __esModule: true,

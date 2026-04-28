@@ -1,5 +1,12 @@
 import CONF from '../src/config';
 
+jest.mock('node:os', () => ({
+  __esModule: true,
+  default: {
+      hostname: jest.fn(() => 'localhost'),
+  },
+}));
+
 describe('Config module', () => {
   beforeEach(() => {
     CONF.isModelCached = true;
