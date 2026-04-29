@@ -1,5 +1,6 @@
 import { QUEUE_TEST_RESULT } from '../src/constants';
 
+const QUEUE_TEST_RESULT_UNIQ = `${QUEUE_TEST_RESULT}:mock-node-uuid`;
 const mockRpop = jest.fn();
 const mockLpush = jest.fn();
 const mockInsert = jest.fn();
@@ -23,6 +24,8 @@ jest.mock('@clickhouse/client', () => ({
 
 jest.mock('utils', () => ({
   sleep: mockSleep,
+  readNodeUuid: jest.fn(() => 'mock-node-uuid'),
+  redis: MockRedis,
 }));
 
 jest.mock('schemas', () => ({}));
@@ -69,28 +72,12 @@ describe('ch module', () => {
   });
 
   describe('initialization', () => {
-    it('should create a Redis instance with DATA_REDIS_URL and retry strategy', () => {
+    it('should create a Redis instance with DATA_REDIS_URL', () => {
       jest.isolateModules(() => {
         require('../src/ch');
       });
 
-      expect(MockRedis).toHaveBeenCalledWith('redis://localhost:6379', {
-        retryStrategy: expect.any(Function),
-      });
-    });
-
-    it('should have a retryStrategy that caps at 2000ms', () => {
-      jest.isolateModules(() => {
-        require('../src/ch');
-      });
-
-      const call = MockRedis.mock.calls[0];
-      const retryStrategy = call[1].retryStrategy;
-
-      expect(retryStrategy(1)).toBe(50);
-      expect(retryStrategy(10)).toBe(500);
-      expect(retryStrategy(40)).toBe(2000);
-      expect(retryStrategy(1000)).toBe(2000);
+      expect(MockRedis).toHaveBeenCalledWith('redis://localhost:6379');
     });
 
     it('should create a ClickHouse client with CLICKHOUSE_URL', () => {
@@ -126,7 +113,7 @@ describe('ch module', () => {
 
       await flushMicrotasks();
 
-      expect(mockRpop).toHaveBeenCalledWith(QUEUE_TEST_RESULT, 5000);
+      expect(mockRpop).toHaveBeenCalledWith(QUEUE_TEST_RESULT_UNIQ, 5000);
       expect(mockSleep).toHaveBeenCalledWith(1000);
     });
 
@@ -199,7 +186,7 @@ describe('ch module', () => {
 
       await flushMicrotasks();
 
-      expect(mockLpush).toHaveBeenCalledWith(QUEUE_TEST_RESULT, rawItem);
+      expect(mockLpush).toHaveBeenCalledWith(QUEUE_TEST_RESULT_UNIQ, rawItem);
       expect(mockSleep).toHaveBeenCalledWith(5000);
     });
 

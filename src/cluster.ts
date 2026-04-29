@@ -9,25 +9,30 @@ import {
 } from './constants';
 import {
   type ICluster,
-} from 'schemas';
+} from './schemas';
 
 let cluster: ICluster | null = null;
 
 if (process.env.CLUSTER_REDIS_URL) {
+  let isPinging = false;
   const client = redis(process.env.CLUSTER_REDIS_URL);
 
   cluster = {
-    startPinging: async (): Promise<void> => {
-      while (true) {
-        try {
-          await client.zadd(QUEUE_NODE_PING, Date.now(), CONF.url);
-        } catch {}
-        await sleep(CONF.clusterPingInterval);
-      }
+    startPinging: (): void => {
+      if (isPinging) return;
+      isPinging = true;
+      (async (): Promise<void> => {
+        while (true) {
+          try {
+            await client.zadd(QUEUE_NODE_PING, Date.now(), `${CONF.uuid}|${CONF.url}`);
+          } catch {}
+          await sleep(CONF.clusterTick);
+        }
+      })();
     },
 
     notifyTestDone: (testId: string): Promise<number> => { // NOTE: less async/await - more performance
-      return client.lpush(QUEUE_TEST_DONE, `${CONF.url}|${testId}`);
+      return client.lpush(QUEUE_TEST_DONE, `${CONF.uuid}|${testId}`);
     }
   };
 }

@@ -1,14 +1,21 @@
 import crypto from 'node:crypto';
-import { generateText } from 'ai';
+
+import {
+  generateText,
+} from 'ai';
 import {
   llmRubric,
   gEval,
   bEval,
 } from '@eva-llm/eva-judge';
 import pLimit from 'p-limit';
-import { LRUCache } from 'lru-cache';
+import {
+  LRUCache,
+} from 'lru-cache';
 
-import { getModel } from './registry';
+import {
+  getModel,
+} from './registry';
 import {
   ASSERT_NAMES,
   type IAssertResult,
@@ -16,11 +23,15 @@ import {
   type ITestResult,
   type TTestSchema,
 } from './schemas';
-import { saveTestResult } from './db';
-import { yieldEventLoop, xnor } from './utils';
+import {
+  saveTestResult,
+} from './db';
+import {
+  yieldEventLoop,
+  xnor,
+} from './utils';
 import CONF from './config';
 import cluster from './cluster';
-import { QUEUE_TEST_DONE } from './constants';
 
 
 let syncOpsCounter = 0;

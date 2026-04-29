@@ -1,11 +1,18 @@
-import { uuidv7 } from 'uuidv7';
+import {
+  uuidv7,
+} from 'uuidv7';
+
 import {
   type TSaveTestResult,
   type IAssertResult,
   type ITestResult,
 } from './schemas';
-import { QUEUE_TEST_RESULT } from './constants';
-import { redis } from './utils';
+import {
+  QUEUE_TEST_RESULT_UNIQ,
+} from './helpers';
+import {
+  redis,
+} from './utils';
 
 
 export const getRedis = () => redis(process.env.DATA_REDIS_URL!);
@@ -37,6 +44,6 @@ export function saveTestResultRedis(
       }))
     };
 
-    await redis.lpush(QUEUE_TEST_RESULT, JSON.stringify(envelope));
+    await redis.lpush(QUEUE_TEST_RESULT_UNIQ, JSON.stringify(envelope));
   }
 }
