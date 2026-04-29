@@ -74,7 +74,7 @@ describe('ch module', () => {
   describe('initialization', () => {
     it('should create a Redis instance with DATA_REDIS_URL', () => {
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       expect(MockRedis).toHaveBeenCalledWith('redis://localhost:6379');
@@ -84,7 +84,7 @@ describe('ch module', () => {
       const { createClient } = require('@clickhouse/client');
 
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       expect(createClient).toHaveBeenCalledWith({
@@ -94,7 +94,7 @@ describe('ch module', () => {
 
     it('should register a SIGTERM handler', () => {
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       expect(processListeners['SIGTERM']).toBeDefined();
@@ -108,7 +108,7 @@ describe('ch module', () => {
         .mockImplementation(hang);   // suspend loop
 
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();
@@ -130,7 +130,7 @@ describe('ch module', () => {
       mockInsert.mockResolvedValue(undefined);
 
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();
@@ -160,7 +160,7 @@ describe('ch module', () => {
       mockInsert.mockResolvedValue(undefined);
 
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();
@@ -181,7 +181,7 @@ describe('ch module', () => {
       mockLpush.mockResolvedValue(1);
 
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();
@@ -196,7 +196,7 @@ describe('ch module', () => {
         .mockImplementation(hang);
 
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();
@@ -217,7 +217,7 @@ describe('ch module', () => {
       mockInsert.mockResolvedValue(undefined);
 
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();
@@ -240,7 +240,7 @@ describe('ch module', () => {
     it('should run flushLoop(0) and then exit', async () => {
       // Main loop hangs immediately (default mock)
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();
@@ -261,7 +261,7 @@ describe('ch module', () => {
 
       // Main loop hangs immediately (default mock)
       jest.isolateModules(() => {
-        require('../src/ch');
+        require('../src/control/ch');
       });
 
       await flushMicrotasks();

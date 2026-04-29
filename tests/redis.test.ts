@@ -23,6 +23,11 @@ jest.mock('uuidv7', () => ({
   uuidv7: jest.fn().mockReturnValue('mock-uuid-v7'),
 }));
 
+jest.mock('../src/utils', () => ({
+  ...jest.requireActual('../src/utils'),
+  createNodeUuid: jest.fn().mockReturnValue('mock-uuid-v7'),
+}));
+
 import Redis from 'ioredis';
 import { getRedis, saveTestResultRedis } from '../src/redis';
 

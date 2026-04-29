@@ -14,7 +14,7 @@
     "build": "tsc",
     "prepare": "prisma generate && pnpm run build",
     "server": "node dst/server.js",
-    "worker": "node dst/ch.js",
+    "worker": "node dst/control/ch.js",
     "ch": "pnpm run server & pnpm run worker",
     "start": "pm2 start ecosystem.config.js",
     "stop": "pm2 delete ecosystem.config.js",

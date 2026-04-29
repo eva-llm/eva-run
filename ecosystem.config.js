@@ -12,7 +12,7 @@ module.exports = {
     },
     {
       name: 'worker',
-      script: './dst/ch.js',
+      script: './dst/control/ch.js',
       instances: 1,
       exec_mode: 'fork',
       watch: false,
