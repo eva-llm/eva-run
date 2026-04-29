@@ -6,6 +6,14 @@ const MockRedis = jest.fn().mockImplementation(() => ({
   quit: jest.fn().mockResolvedValue('OK'),
 }));
 
+jest.mock('node:os', () => ({
+  __esModule: true,
+  default: {
+      hostname: jest.fn(() => 'localhost'),
+  },
+}));
+
+
 jest.mock('ioredis', () => ({
   __esModule: true,
   default: MockRedis,
@@ -115,7 +123,7 @@ describe('redis module', () => {
 
       expect(mockRedis.lpush).toHaveBeenCalledTimes(1);
       expect(mockRedis.lpush).toHaveBeenCalledWith(
-        QUEUE_TEST_RESULT,
+       `${QUEUE_TEST_RESULT}:mock-uuid-v7`,
         expect.any(String),
       );
 

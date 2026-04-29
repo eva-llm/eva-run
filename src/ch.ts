@@ -1,17 +1,23 @@
-import Redis from 'ioredis';
-import { createClient } from '@clickhouse/client';
-import { QUEUE_TEST_RESULT } from './constants';
+import {
+  createClient,
+} from '@clickhouse/client';
+
+import {
+  QUEUE_TEST_RESULT,
+} from './constants';
 import {
   type IAssertResult,
   type ITestResult,
 } from './schemas';
-import { sleep } from './utils';
+import {
+  readNodeUuid,
+  sleep,
+  redis,
+} from './utils';
 
+const QUEUE_TEST_RESULT_UNIQ = `${QUEUE_TEST_RESULT}:${readNodeUuid()}`; // NOTE: we don't use `./helpers` here.
 
-const redis = new Redis(process.env.DATA_REDIS_URL!, {
-  retryStrategy: (times) => Math.min(times * 50, 2000),
-});
-
+const redisClient = redis(process.env.DATA_REDIS_URL!);
 const clickHouse = createClient({
   host: process.env.CLICKHOUSE_URL!,
 });
@@ -29,7 +35,7 @@ async function flushLoop(alwaysRun = 1) {
 
   do {
     try {
-      rawData = await redis.rpop(QUEUE_TEST_RESULT, BATCH_SIZE);
+      rawData = await redisClient.rpop(QUEUE_TEST_RESULT_UNIQ, BATCH_SIZE);
       
       if (!rawData?.length) {
         await sleep(SEC);
@@ -73,7 +79,7 @@ async function flushLoop(alwaysRun = 1) {
     } catch (err) {
       // NOTE: Use always `LIMIT 1 BY id` in SQL query to avoid assert duplicates
       if (rawData?.length) {
-        await redis.lpush(QUEUE_TEST_RESULT, ...rawData);
+        await redisClient.lpush(QUEUE_TEST_RESULT_UNIQ, ...rawData);
       }
       await sleep(FLUSH_INTERVAL);
     }

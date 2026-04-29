@@ -110,6 +110,6 @@ export type TSaveTestResult = (
 ) => Promise<void>;
 
 export interface ICluster {
-  startPinging: () => Promise<void>;
+  startPinging: () => void;
   notifyTestDone: (testId: string) => Promise<number>;
 }

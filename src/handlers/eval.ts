@@ -2,7 +2,12 @@ import {
   FastifyInstance,
   FastifyRequest,
 } from 'fastify';
-import { uuidv7 } from 'uuidv7';
+import {
+  uuidv7,
+} from 'uuidv7';
+
+import runTest from '../test';
+import CONF from '../config';
 import {
   TestSchema,
   EvalResponse,
@@ -10,8 +15,6 @@ import {
   type TEvalResponse,
 } from '../schemas';
 
-import runTest from '../test';
-import CONF from '../config';
 
 
 /**

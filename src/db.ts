@@ -1,6 +1,14 @@
-import { type TSaveTestResult } from './schemas';
-import { saveTestResultPg, getPrisma } from './pg';
-import { saveTestResultRedis, getRedis } from './redis';
+import {
+  type TSaveTestResult,
+} from './schemas';
+import {
+  saveTestResultPg,
+  getPrisma,
+} from './pg';
+import {
+  saveTestResultRedis,
+  getRedis,
+} from './redis';
 
 
 let saveTestResult: TSaveTestResult;

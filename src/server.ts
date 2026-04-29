@@ -2,7 +2,9 @@ import Fastify from 'fastify';
 
 import CONF from './config';
 import cluster from './cluster';
-import { registerEvalRoute } from './handlers/eval';
+import {
+  registerEvalRoute,
+} from './handlers/eval';
 
 /**
  * Main entry point for the Fastify server.
