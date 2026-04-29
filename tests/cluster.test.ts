@@ -14,8 +14,9 @@ jest.mock('ioredis', () => ({
 jest.mock('../src/config', () => ({
   __esModule: true,
   default: {
+    uuid: 'test-node-uuid',
     url: 'http://test-node:3000',
-    clusterPingInterval: 100,
+    clusterTick: 100,
   },
 }));
 
@@ -77,7 +78,7 @@ describe('cluster module', () => {
       it('should call lpush with QUEUE_TEST_DONE and node URL + testId', async () => {
         const { default: cluster } = await import('../src/cluster');
         await cluster!.notifyTestDone('test-123');
-        expect(mockLpush).toHaveBeenCalledWith(QUEUE_TEST_DONE, 'http://test-node:3000|test-123');
+        expect(mockLpush).toHaveBeenCalledWith(QUEUE_TEST_DONE, 'test-node-uuid|test-123');
       });
 
       it('should return the result of lpush', async () => {
@@ -90,11 +91,14 @@ describe('cluster module', () => {
 
     describe('startPinging', () => {
       it('should call zadd with QUEUE_NODE_PING and node URL', async () => {
+        let resolveStop!: () => void;
+        const stopPromise = new Promise<void>(resolve => { resolveStop = resolve; });
         let callCount = 0;
         const mockSleep = jest.fn().mockImplementation(() => {
           callCount++;
           if (callCount >= 2) {
-            return Promise.reject(new Error('stop loop'));
+            resolveStop();
+            return new Promise<void>(() => {}); // hang to avoid unhandled rejection
           }
           return Promise.resolve();
         });
@@ -104,16 +108,20 @@ describe('cluster module', () => {
         }));
 
         const { default: cluster } = await import('../src/cluster');
-        await expect(cluster!.startPinging()).rejects.toThrow('stop loop');
-        expect(mockZadd).toHaveBeenCalledWith(QUEUE_NODE_PING, expect.any(Number), 'http://test-node:3000');
+        cluster!.startPinging();
+        await stopPromise;
+        expect(mockZadd).toHaveBeenCalledWith(QUEUE_NODE_PING, expect.any(Number), 'test-node-uuid|http://test-node:3000');
       });
 
       it('should swallow errors from zadd and continue pinging', async () => {
+        let resolveStop!: () => void;
+        const stopPromise = new Promise<void>(resolve => { resolveStop = resolve; });
         let callCount = 0;
         const mockSleep = jest.fn().mockImplementation(() => {
           callCount++;
           if (callCount >= 2) {
-            return Promise.reject(new Error('stop loop'));
+            resolveStop();
+            return new Promise<void>(() => {}); // hang to avoid unhandled rejection
           }
           return Promise.resolve();
         });
@@ -124,7 +132,8 @@ describe('cluster module', () => {
         mockZadd.mockRejectedValueOnce(new Error('redis down'));
 
         const { default: cluster } = await import('../src/cluster');
-        await expect(cluster!.startPinging()).rejects.toThrow('stop loop');
+        cluster!.startPinging();
+        await stopPromise;
         expect(mockSleep).toHaveBeenCalledTimes(2);
       });
     });

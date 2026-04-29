@@ -4,7 +4,7 @@ import {
 import {
   saveTestResultPg,
   getPrisma,
-} from './pg';
+} from './postgres';
 import {
   saveTestResultRedis,
   getRedis,

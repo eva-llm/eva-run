@@ -3,7 +3,7 @@ const mockSaveTestResultRedis = jest.fn().mockReturnValue('redis-save-fn');
 const mockGetPrisma = jest.fn().mockReturnValue('prisma-client');
 const mockGetRedis = jest.fn().mockReturnValue('redis-client');
 
-jest.mock('../src/pg', () => ({
+jest.mock('../src/postgres', () => ({
   saveTestResultPg: mockSaveTestResultPg,
   getPrisma: mockGetPrisma,
 }));
