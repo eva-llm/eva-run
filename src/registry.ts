@@ -35,6 +35,7 @@ import {
 import CONF from './config';
 
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 const PROVIDERS: Record<string, Function> = {
   openai,
   anthropic,

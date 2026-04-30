@@ -37,6 +37,7 @@ export const createNodeUuid = (): string => {
     closeSync(fd);
     
     return uuid;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     if (err.code === 'EEXIST') {
       return readNodeUuid(); // NOTE: somehow created which shouldn't happen, but just in case

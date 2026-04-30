@@ -25,6 +25,7 @@ if (process.env.CLUSTER_REDIS_URL) {
         while (true) {
           try {
             await client.zadd(QUEUE_NODE_PING, Date.now(), `${CONF.uuid}|${CONF.url}`);
+          // eslint-disable-next-line no-empty
           } catch {}
           await sleep(CONF.clusterTick);
         }

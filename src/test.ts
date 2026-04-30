@@ -70,6 +70,7 @@ const getAssertResult = async (
     let score: number;
     let reason: string;
     let passed: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let metadata: Record<string, any> | undefined;
 
     switch(name) {
@@ -291,8 +292,10 @@ const getAssertResult = async (
 export default async function testRun (testConfig: TTestSchema): Promise<void> {
   const testStartedAt = new Date();
   const { prompt } = testConfig;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const testData: Record<string, any> = {};
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let metadata: Record<string, any>;
   let output: string;
 

@@ -51,7 +51,7 @@ async function flushLoop(alwaysRun = 1) {
         pgTests.push(test);
         pgAsserts.push(...asserts);
       });
-    } catch (err) {
+    } catch {
       await sleep(FLUSH_INTERVAL);
       // NOTE: Just trash data if error was on parsing
       continue;
@@ -68,7 +68,7 @@ async function flushLoop(alwaysRun = 1) {
       }
 
       rawData = null; // NOTE: Flush to avoid pull back old data on redis error
-    } catch (err) {
+    } catch {
       // NOTE: Use always `LIMIT 1 BY id` (or unique constraint) in DB to avoid assert duplicates
       if (rawData?.length) {
         await redisClient.lpush(QUEUE_TEST_RESULT_UNIQ, ...rawData);
