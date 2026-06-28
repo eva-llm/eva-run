@@ -42,6 +42,6 @@ export const createNodeUuid = (): string => {
     if (err.code === 'EEXIST') {
       return readNodeUuid(); // NOTE: somehow created which shouldn't happen, but just in case
     }
-    throw new Error(`Failed to create identity in RAM: ${err.message}`);
+    throw new Error('Failed to create identity in RAM', { cause: err });
   }
 }

@@ -3,13 +3,15 @@
     "moduleResolution":"nodenext",
     "module": "NodeNext",
     "target": "ESNext",
+    "rootDir": "./src",
     "outDir": "./dst",
-    "baseUrl": "./src",
+    "types": [ "node", "jest" ],
     "strict": true,
     "removeComments": true,
     "declaration": true,
     "sourceMap": true,
     "skipLibCheck": true
   },
-  "include": ["./src"]
+  "include": ["./src"],
+  "exclude": ["node_modules", "dst"]
 }
