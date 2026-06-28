@@ -28,7 +28,7 @@ const BATCH_SIZE = 500;
 const FLUSH_INTERVAL = 5000; // Flush every 5 seconds if batch is not full
 
 async function flushLoop(alwaysRun = 1) {
-  let rawData: string[] | null = null;
+  let rawData: string[] | null;
   let pgTests: ITestResult[];
   let pgAsserts: Prisma.AssertResultCreateManyInput[];
 

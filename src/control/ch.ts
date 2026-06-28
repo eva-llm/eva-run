@@ -29,7 +29,7 @@ const TEST_TABLE = 'test_results';
 const ASSERT_TABLE = 'assert_results';
 
 async function flushLoop(alwaysRun = 1) {
-  let rawData: string[] | null = null;
+  let rawData: string[] | null;
   let chTests: ITestResult[];
   let chAsserts: IAssertResult[];
 
